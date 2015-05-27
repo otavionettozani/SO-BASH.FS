@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "bash.fs/inode.c"
-            timestampString = "454387263.661379"
+            filePath = "bash.fs/main.c"
+            timestampString = "454397643.467872"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "154"
-            endingLineNumber = "154"
-            landmarkName = "createInodeInDirectory()"
+            startingLineNumber = "32"
+            endingLineNumber = "32"
+            landmarkName = "main()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

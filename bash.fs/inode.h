@@ -99,15 +99,21 @@ inode getInodeFromAbsoluteAddress(halfWord address, FILE* ufs);
 halfWord getFreeInode(FILE* ufs);
 
 //save the inode in its position, also, update the time of modification of this node.
-void saveInode(inode node, FILE* ufs);
+void saveInode(inode* node, FILE* ufs);
 
-//returns 0 if cant find the requested inode or a halfword containing the address of the requested inode in the file
+//change the permissions of the given inode
+void changeInodePermissions(inode* node, byte read, byte write, byte execute);
+
+//returns 0 if cant find the requested inode or a halfword containing the absolute address of the requested inode
 halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs);
 
-
 //tries to create a new inode at the given directory and returns its address in the file. if fails returns 0
-halfWord createInodeInDirectory(inode directory,halfWord directoryAddress ,char* filename, FILE* ufs, byte read,
+halfWord createInodeInDirectory(inode* directory,char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory);
 
+//set the bit relative to the inode as used in the inode bitmap
+void setInodeBitmapAsUsed(inode node, FILE* ufs);
 
+//set the bit relative to the inode as unused in the inode bitmap
+void setInodeBitmapAsUnused(inode node, FILE* ufs);
 

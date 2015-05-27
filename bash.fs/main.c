@@ -20,13 +20,12 @@ int main(int argc, const char * argv[]) {
 	
 	FILE* ufs = fopen(filename, "r+");
 	
-	inode root;
+	inode root = getInodeFromRelativeAddress(0, ufs);
 	
-	fseek(ufs, SectionInodes, SEEK_SET);
-	fread(&root, sizeof(inode), 1, ufs);
 	
-	createInodeInDirectory(root, SectionInodes,"name", ufs, 1, 1, 1, 1);
 	
+	createInodeInDirectory(&root,"name_of_file", ufs, 1, 1, 1, 1);
+	inode a = getInodeFromRelativeAddress(1, ufs);
 	
 	
 	

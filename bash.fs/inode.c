@@ -95,6 +95,51 @@ halfWord getFreeInode(FILE* ufs){
 	return 0;
 }
 
+void setInodeBitmapAsUsed(inode node, FILE* ufs){
+	
+	halfWord selectByte = node.id/8;
+	halfWord selectBit = node.id%8;
+	
+	halfWord absoluteAddress = SectionInodeBitmap+selectByte*sizeof(byte);
+	
+	byte bitmapByte;
+	
+	fseek(ufs, absoluteAddress, SEEK_SET);
+	fread(&bitmapByte, sizeof(byte), 1, ufs);
+	
+	setBit(&bitmapByte, 1<<selectBit);
+	
+	fseek(ufs, absoluteAddress, SEEK_SET);
+	
+	fwrite(&bitmapByte, sizeof(byte), 1, ufs);
+	
+	return;
+	
+}
+
+void setInodeBitmapAsUnused(inode node, FILE* ufs){
+	
+	halfWord selectByte = node.id/8;
+	halfWord selectBit = node.id%8;
+	
+	halfWord absoluteAddress = SectionInodeBitmap+selectByte*sizeof(byte);
+	
+	byte bitmapByte;
+	
+	fseek(ufs, absoluteAddress, SEEK_SET);
+	fread(&bitmapByte, sizeof(byte), 1, ufs);
+	
+	resetBit(&bitmapByte, 1<<selectBit);
+	
+	fseek(ufs, absoluteAddress, SEEK_SET);
+	
+	fwrite(&bitmapByte, sizeof(byte), 1, ufs);
+	
+	return;
+	
+	
+}
+
 
 halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
 	
@@ -113,19 +158,25 @@ halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
 			return convertRelativeAddressToAbsoluteAddress(directory.blocks[i]);
 		}
 		
+		i++;
+		
+		if(i==1024){
+			break;
+		}
+		
 	}
 	
 	return 0;
 	
 }
 
-void saveInode(inode node, FILE* ufs){
+void saveInode(inode* node, FILE* ufs){
 	
-	halfWord absolutePosition = convertRelativeAddressToAbsoluteAddress(node.id);
+	halfWord absolutePosition = convertRelativeAddressToAbsoluteAddress(node->id);
 	
 	fseek(ufs, absolutePosition, SEEK_SET);
 	
-	node.metadata.time = (halfWord)time(NULL);
+	node->metadata.time = (word)time(NULL);
 	
 	fwrite(&node, sizeof(inode), 1, ufs);
 	
@@ -133,36 +184,58 @@ void saveInode(inode node, FILE* ufs){
 	
 }
 
+void changeInodePermissions(inode* node, byte read, byte write, byte execute){
+	
+	if (read) {
+		setBit(&node->metadata.flags, FlagPmRead);
+	}
+	if (write){
+		setBit(&node->metadata.flags, FlagPmWrite);
+	}
+	if (execute){
+		setBit(&node->metadata.flags, FlagPmExec);
+	}
+	
+}
 
-halfWord createInodeInDirectory(inode directory, halfWord directoryAddress ,char* filename, FILE* ufs, byte read,
+
+halfWord createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory)
 {
+	//create the new inode
 	inode newInode;
 	halfWord newInodeAddress;
 	
 	newInodeAddress = getFreeInode(ufs);
 	
 	newInode = getInodeFromAbsoluteAddress(newInodeAddress, ufs);
-	
-	//load the given free inode from memory
-	fseek(ufs, newInodeAddress, SEEK_SET);
-	fread(&newInode, sizeof(inode), 1, ufs);
-	
+
+	//set the name of the inode
 	strcpy(newInode.metadata.name, filename);
 	
-	if (read) {
-		setBit(&newInode.metadata.flags, FlagPmRead);
-	}
-	if (write){
-		setBit(&newInode.metadata.flags, FlagPmWrite);
-	}
+	
 	if (isDirectory){
 		setBit(&newInode.metadata.flags, FlagIsDir);
 	}
-	if (execute){
-		setBit(&newInode.metadata.flags, FlagPmExec);
+	
+	changeInodePermissions(&newInode, read, write, execute);
+	
+	newInode.metadata.parent = directory->id;
+	
+	//save the new inode
+	saveInode(&newInode, ufs);
+	setInodeBitmapAsUsed(newInode, ufs);
+	
+	
+	//change the current inode of directory so that its content contains the saved file address as its child
+	int i=0;
+	while (directory->blocks[i]!=0) {
+		i++;
 	}
 	
+	directory->blocks[i] = newInode.id;
+	
+	saveInode(directory, ufs);
 	
 	return 0;
 }
