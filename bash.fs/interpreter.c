@@ -177,7 +177,7 @@ listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs){
 	aux = list2;
 	
 	while (aux->next!=NULL) {
-		aux = list2->next;
+		aux = aux->next;
 	}
 	
 	if(aux->node.id==0){
@@ -197,7 +197,7 @@ listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs){
 				return currentDir;
 			}
 			while (aux->next!=NULL) {
-				aux = list2->next;
+				aux = aux->next;
 			}
 			aux->next = currentDir;
 			return list2;
