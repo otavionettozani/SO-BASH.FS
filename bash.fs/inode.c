@@ -165,6 +165,8 @@ halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
 		
 	}
 	
+	
+	
 	return 0;
 	
 }

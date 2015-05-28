@@ -25,12 +25,14 @@ typedef struct ListNode{
 	
 }listNode;
 
-//add a node to the stack
+//add a node as if the list is a stack
 listNode* addList(listNode* root, inode node);
 
-//remove a node from the stack
+//remove a node as if the list is a stack
 listNode* removeList(listNode* root);
 
+//remove a node as if the list is a row
+listNode* removeFirstNode(listNode* root);
 
 //------------- manipulation of strings for the problem ---------------//
 
@@ -39,3 +41,9 @@ listNode* createListFromString(char* string, listNode*root, FILE* ufs);
 
 //prints the full path of the list
 void printListNames(listNode* list);
+
+
+
+//------------- tasks execution ------------------//
+
+listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs);

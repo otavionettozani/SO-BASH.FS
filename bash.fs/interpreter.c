@@ -38,13 +38,25 @@ listNode* removeList(listNode* root){
 	
 }
 
+listNode* removeFirstNode(listNode* root){
+	
+	if (root->next==NULL) {
+		free(root);
+		return NULL;
+	}
+	
+	root->next = removeFirstNode(root->next);
+	return root;
+	
+}
+
 
 
 listNode* createListFromString(char* string, listNode*root, FILE* ufs){
 	
 	word i=0;
 	word currentNameCounter =0;
-	char currentName[256];
+	char currentName[256] = {0};
 	
 	listNode* list = NULL;
 	inode aux;
@@ -70,13 +82,21 @@ listNode* createListFromString(char* string, listNode*root, FILE* ufs){
 		if(string[i]=='/'){
 			
 			if(currentName[0]=='.' && currentName[1]=='.' && currentName[2]==0){
-				list = removeList(list);
+				if(list->node.id!=0){
+					if(list->next == NULL){
+						inode nodeDotDot = getInodeFromRelativeAddress(list->node.metadata.parent, ufs);
+						list = removeList(list);
+						list = addList(list, nodeDotDot);
+					}else{
+						list = removeList(list);
+					}
+				}
 			}else if((currentName[0]=='.' && currentName[1]==0) || currentName[0]==0){
 				
 			}else{
 				auxAddr = seekInDirectory(list->node, currentName, ufs);
 				if(auxAddr == 0){
-					printf("Error: No such file or directory!");
+					printf("Error: No such file or directory!\n");
 					while (list!=NULL) {
 						list = removeList(list);
 					}
@@ -100,15 +120,22 @@ listNode* createListFromString(char* string, listNode*root, FILE* ufs){
 	}
 	
 	if(currentName[0]=='.' && currentName[1]=='.' && currentName[2]==0){
-		if(list->next!=NULL){
-			list = removeList(list);
+		if(list->node.id!=0){
+			if(list->next == NULL){
+				inode nodeDotDot = getInodeFromRelativeAddress(list->node.metadata.parent, ufs);
+				list = removeList(list);
+				list = addList(list, nodeDotDot);
+			}else{
+				list = removeList(list);
+			}
 		}
+		
 	}else if((currentName[0]=='.' && currentName[1]==0) || currentName[0]==0){
 		
 	}else{
 		auxAddr = seekInDirectory(list->node, currentName, ufs);
 		if(auxAddr == 0){
-			printf("Error: No such file or directory!");
+			printf("Error: No such file or directory!\n");
 			while (list!=NULL) {
 				list = removeList(list);
 			}
@@ -131,4 +158,55 @@ void printListNames(listNode* list){
 	printListNames(list->next);
 	printf("%s/",list->node.metadata.name);
 	
+}
+
+
+
+
+//------------------ tasks execution -------------------//
+
+listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs){
+	
+	listNode* list2 = createListFromString(path, currentDir, ufs);
+	listNode* aux;
+	
+	if(list2 == NULL){
+		return currentDir;
+	}
+	
+	aux = list2;
+	
+	while (aux->next!=NULL) {
+		aux = list2->next;
+	}
+	
+	if(aux->node.id==0){
+		
+		while (currentDir!=NULL) {
+			currentDir = removeList(currentDir);
+		}
+		return list2;
+	}
+	
+	
+	while (currentDir!=NULL) {
+		if(aux->node.id == currentDir->node.id){
+			list2 = removeFirstNode(list2);
+			aux = list2;
+			if(aux == NULL){
+				return currentDir;
+			}
+			while (aux->next!=NULL) {
+				aux = list2->next;
+			}
+			aux->next = currentDir;
+			return list2;
+		}else{
+			currentDir = removeList(currentDir);
+		}
+	}
+	
+	
+	
+	return currentDir;
 }

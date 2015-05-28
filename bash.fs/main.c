@@ -39,10 +39,16 @@ int main(int argc, const char * argv[]) {
 	*/
 	
 	
-	listNode* list = NULL;
-	list = createListFromString("name_of_file3/././//", currentDirectory, ufs);
+	currentDirectory = changeCurrentDirectory("name_of_file3", currentDirectory, ufs);
 	
-	printListNames(list);
+	//createInodeInDirectory(&currentDirectory->node, "sub_dir", ufs, 1, 1, 1, 1);
+	
+	currentDirectory = changeCurrentDirectory("sub_dir", currentDirectory, ufs);
+	
+	currentDirectory = changeCurrentDirectory("../sub_dir", currentDirectory, ufs);
+	
+	printListNames(currentDirectory);
+	
 	
 	fclose(ufs);
     return 0;
