@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		C4981F191B15004200079C3B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C4981F181B15004200079C3B /* main.c */; };
 		C4981F211B15006000079C3B /* inode.c in Sources */ = {isa = PBXBuildFile; fileRef = C4981F1F1B15006000079C3B /* inode.c */; };
-		C4981F241B15034300079C3B /* directory.c in Sources */ = {isa = PBXBuildFile; fileRef = C4981F221B15034300079C3B /* directory.c */; };
+		C4981F271B169F6100079C3B /* interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = C4981F251B169F6100079C3B /* interpreter.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,8 +29,8 @@
 		C4981F181B15004200079C3B /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		C4981F1F1B15006000079C3B /* inode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inode.c; sourceTree = "<group>"; };
 		C4981F201B15006000079C3B /* inode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inode.h; sourceTree = "<group>"; };
-		C4981F221B15034300079C3B /* directory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = directory.c; sourceTree = "<group>"; };
-		C4981F231B15034300079C3B /* directory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = directory.h; sourceTree = "<group>"; };
+		C4981F251B169F6100079C3B /* interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interpreter.c; sourceTree = "<group>"; };
+		C4981F261B169F6100079C3B /* interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interpreter.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,10 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				C4981F181B15004200079C3B /* main.c */,
-				C4981F221B15034300079C3B /* directory.c */,
-				C4981F231B15034300079C3B /* directory.h */,
 				C4981F1F1B15006000079C3B /* inode.c */,
 				C4981F201B15006000079C3B /* inode.h */,
+				C4981F251B169F6100079C3B /* interpreter.c */,
+				C4981F261B169F6100079C3B /* interpreter.h */,
 			);
 			path = bash.fs;
 			sourceTree = "<group>";
@@ -128,7 +128,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C4981F241B15034300079C3B /* directory.c in Sources */,
+				C4981F271B169F6100079C3B /* interpreter.c in Sources */,
 				C4981F191B15004200079C3B /* main.c in Sources */,
 				C4981F211B15006000079C3B /* inode.c in Sources */,
 			);

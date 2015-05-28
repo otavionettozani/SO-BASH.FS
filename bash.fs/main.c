@@ -24,9 +24,15 @@ int main(int argc, const char * argv[]) {
 	
 	
 	
-	createInodeInDirectory(&root,"name_of_file", ufs, 1, 1, 1, 1);
+	createInodeInDirectory(&root,"name_of_file3", ufs, 1, 1, 1, 1);
 	inode a = getInodeFromRelativeAddress(1, ufs);
 	
+	halfWord b = seekInDirectory(root, "name_of_file3", ufs);
+	
+	if(b){
+		inode deletable = getInodeFromAbsoluteAddress(b, ufs);
+		deleteInode(deletable, &root,ufs);
+	}
 	
 	
 	fclose(ufs);

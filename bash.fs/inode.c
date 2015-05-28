@@ -150,7 +150,11 @@ halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
 	
 	word i=0;
 	
-	while (directory.blocks[i] != 0) {
+	for(i=0; i<1024; i++) {
+		
+		if(!directory.blocks[i]){
+			continue;
+		}
 		
 		inode node = getInodeFromRelativeAddress(directory.blocks[i], ufs);
 		
@@ -158,11 +162,6 @@ halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
 			return convertRelativeAddressToAbsoluteAddress(directory.blocks[i]);
 		}
 		
-		i++;
-		
-		if(i==1024){
-			break;
-		}
 		
 	}
 	
@@ -176,9 +175,11 @@ void saveInode(inode* node, FILE* ufs){
 	
 	fseek(ufs, absolutePosition, SEEK_SET);
 	
-	node->metadata.time = (word)time(NULL);
+	word tm = time(NULL);
 	
-	fwrite(&node, sizeof(inode), 1, ufs);
+	node->metadata.time = tm;
+	
+	fwrite(node, sizeof(inode), 1, ufs);
 	
 	return;
 	
@@ -237,6 +238,22 @@ halfWord createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byt
 	
 	saveInode(directory, ufs);
 	
-	return 0;
+	return convertRelativeAddressToAbsoluteAddress(newInode.id);
+}
+
+void deleteInode(inode node, inode* parent, FILE*ufs){
+	
+	
+	word i =0;
+	while (parent->blocks[i]!=node.id) {
+		i++;
+	}
+	
+	setInodeBitmapAsUnused(node, ufs);
+	
+	parent->blocks[i] = (halfWord)0;
+	
+	saveInode(parent, ufs);
+	
 }
 

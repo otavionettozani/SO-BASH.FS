@@ -107,9 +107,12 @@ void changeInodePermissions(inode* node, byte read, byte write, byte execute);
 //returns 0 if cant find the requested inode or a halfword containing the absolute address of the requested inode
 halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs);
 
-//tries to create a new inode at the given directory and returns its address in the file. if fails returns 0
+//tries to create a new inode at the given directory and returns its absolute address. if fails returns 0
 halfWord createInodeInDirectory(inode* directory,char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory);
+
+//delete the selected inode
+void deleteInode(inode node,inode* parent,FILE*ufs);
 
 //set the bit relative to the inode as used in the inode bitmap
 void setInodeBitmapAsUsed(inode node, FILE* ufs);
