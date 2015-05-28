@@ -34,3 +34,8 @@ listNode* removeList(listNode* root);
 
 //------------- manipulation of strings for the problem ---------------//
 
+//create a full list of nodes from the given string
+listNode* createListFromString(char* string, listNode*root, FILE* ufs);
+
+//prints the full path of the list
+void printListNames(listNode* list);

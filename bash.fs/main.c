@@ -7,7 +7,7 @@
 //
 
 #include <stdio.h>
-#include "inode.h"
+#include "interpreter.h"
 #include <stdlib.h>
 
 #define FILE_SIZE 1024*1024*24
@@ -22,8 +22,11 @@ int main(int argc, const char * argv[]) {
 	
 	inode root = getInodeFromRelativeAddress(0, ufs);
 	
+	listNode* currentDirectory = NULL;
 	
+	currentDirectory = addList(currentDirectory, root);
 	
+	/*
 	createInodeInDirectory(&root,"name_of_file3", ufs, 1, 1, 1, 1);
 	inode a = getInodeFromRelativeAddress(1, ufs);
 	
@@ -33,7 +36,13 @@ int main(int argc, const char * argv[]) {
 		inode deletable = getInodeFromAbsoluteAddress(b, ufs);
 		deleteInode(deletable, &root,ufs);
 	}
+	*/
 	
+	
+	listNode* list = NULL;
+	list = createListFromString("name_of_file3/././//", currentDirectory, ufs);
+	
+	printListNames(list);
 	
 	fclose(ufs);
     return 0;
