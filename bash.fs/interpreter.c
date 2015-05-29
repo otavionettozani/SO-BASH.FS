@@ -96,7 +96,7 @@ listNode* createListFromString(char* string, listNode*root, FILE* ufs){
 			}else{
 				auxAddr = seekInDirectory(list->node, currentName, ufs);
 				if(auxAddr == 0){
-					printf("Error: No such file or directory!\n");
+					printf("Error:'%s' No such file or directory!\n",string);
 					while (list!=NULL) {
 						list = removeList(list);
 					}
@@ -135,7 +135,7 @@ listNode* createListFromString(char* string, listNode*root, FILE* ufs){
 	}else{
 		auxAddr = seekInDirectory(list->node, currentName, ufs);
 		if(auxAddr == 0){
-			printf("Error: No such file or directory!\n");
+			printf("Error:'%s' No such file or directory!\n",string);
 			while (list!=NULL) {
 				list = removeList(list);
 			}
@@ -225,5 +225,51 @@ listNode* createListOfChildren(inode parent, FILE* ufs){
 	}
 	
 	return children;
+}
+
+
+
+void createDirectory(char* path, FILE* ufs, listNode* currentDir){
+	
+	char* lastBar;
+	char nameCopy[256]={0};
+	lastBar = strrchr(path, '/');
+	
+	if (lastBar) {
+		strcpy(nameCopy, lastBar+sizeof(char));
+		
+		if(lastBar!=path){
+			lastBar[0] = 0;
+		}else{
+			lastBar[1]=0;
+		}
+	}else{
+		strcpy(nameCopy, path);
+		path[0] = 0;
+	}
+	
+	
+	listNode* list = createListFromString(path, currentDir, ufs);
+	
+	//verify if the parent dir is already at the memory
+	listNode* aux = currentDir;
+	while (aux!= NULL) {
+		if(aux->node.id == list->node.id){
+			break;
+		}
+		aux = aux->next;
+	}
+	
+	if(!aux){
+		createInodeInDirectory(&list->node, nameCopy, ufs, 1, 1, 1, 1);
+	}else{
+		createInodeInDirectory(&aux->node, nameCopy, ufs, 1, 1, 1, 1);
+	}
+	while (list != NULL) {
+		list = removeList(list);
+	}
+	
+	return;
+	
 }
 

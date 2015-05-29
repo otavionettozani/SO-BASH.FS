@@ -75,3 +75,5 @@ void printListNames(listNode* list);
 listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs);
 
 listNode* createListOfChildren(inode parent, FILE* ufs);
+
+void createDirectory(char* path, FILE* ufs, listNode* currentDir);

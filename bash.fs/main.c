@@ -125,7 +125,9 @@ int main(int argc, const char * argv[]) {
 						children = removeList(children);
 					}
 				}
-				
+				state = StateEnd;
+			}else if(inst == MKDIR){
+				createDirectory(arg1, ufs, currentDirectory);
 				state = StateEnd;
 			}
 			
