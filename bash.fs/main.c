@@ -56,68 +56,44 @@ int main(int argc, const char * argv[]) {
 	
 	//end of test purposes
 	
-	char input[10], arg1[1024], arg2[1024];
+	char input[10], arg1[1024], arg2[1024], buffer[2058];
+	byte readArguments = 0;
 	execState state = StateEnd;
 	instruction inst = FAIL;
 	listNode* children;
-	listNode* auxNode;
 	
 	while (1) {
 		
-		if(state == StateFetch1){
-			scanf("%s",input);
-			
+		if(state == StateFetch){
+			fgets(buffer, sizeof(buffer), stdin);
+			readArguments = sscanf(buffer,"%s %s %s",input, arg1, arg2);
 			if(!strcmp(input, "exit")){
 				inst = EXIT;
-				state = StateExec;
 			}else if(!strcmp(input, "ls")){
 				inst = LS;
-				state = StateExec;
 			}else if(!strcmp(input, "chmode")){
 				inst = CHMOD;
-				state = StateFetch2;
 			}else if(!strcmp(input, "mkdir")){
 				inst = MKDIR;
-				state = StateFetch2;
 			}else if(!strcmp(input, "chdir")){
 				inst = CHDIR;
-				state = StateFetch2;
 			}else if(!strcmp(input, "rm")){
 				inst = RM;
-				state = StateFetch2;
 			}else if(!strcmp(input, "echo")){
 				inst = Echo;
-				state = StateFetch2;
 			}else if(!strcmp(input, "cat")){
 				inst = CAT;
-				state = StateFetch2;
 			}else if(!strcmp(input, "mv")){
 				inst = MV;
-				state = StateFetch2;
 			}else if(!strcmp(input, "find")){
 				inst = Find;
-				state = StateFetch2;
 			}else if(!strcmp(input, "defrag")){
 				inst = DEFRAG;
-				state = StateExec;
 			}else {
 				inst = FAIL;
-				state = StateExec;
 			}
-			
-			
-		}else if(state == StateFetch2){
-			if(inst == MKDIR || inst == CHDIR || inst == RM || inst == CAT){
-				scanf("%s",arg1);
-				state = StateExec;
-			}else{
-				scanf("%s",arg1);
-				state = StateFetch3;
-			}
-			
-		}else if(state == StateFetch3){
-			scanf("%s",arg2);
 			state = StateExec;
+			
 		}else if(state == StateExec){
 			if(inst == EXIT){
 				printf("Bye Bye!\n");
@@ -130,7 +106,25 @@ int main(int argc, const char * argv[]) {
 				state = StateEnd;
 			}else if(inst == LS){
 				children = createListOfChildren(currentDirectory->node, ufs);
-
+				if(readArguments == 2 && !strcmp(arg1, "-l")){
+					
+				}else{
+					byte flip = 0;
+					while (children!= NULL) {
+						printf("%s",children->node.metadata.name);
+						if (children->node.metadata.flags & FlagIsDir) {
+							printf("/");
+						}
+						if (flip == 2) {
+							printf("\n");
+						}else{
+							printf("\t");
+						}
+						
+						flip = flip == 2? 0: flip +1;
+						children = removeList(children);
+					}
+				}
 				
 				state = StateEnd;
 			}
@@ -139,7 +133,7 @@ int main(int argc, const char * argv[]) {
 			printf("\n\n");
 			printListNames(currentDirectory);
 			printf(" $: ");
-			state = StateFetch1;
+			state = StateFetch;
 		}
 		
 	}

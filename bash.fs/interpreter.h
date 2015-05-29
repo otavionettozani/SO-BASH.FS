@@ -18,11 +18,9 @@
 
 //------------------- input interpreter --------------//
 typedef enum ExecutionStates{
-	StateFetch1 = 0,
-	StateFetch2 = 1,
-	StateFetch3 = 2,
-	StateExec = 3,
-	StateEnd = 4,
+	StateFetch = 0,
+	StateExec = 1,
+	StateEnd = 2,
 }execState;
 
 
