@@ -210,3 +210,20 @@ listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs){
 	
 	return currentDir;
 }
+
+
+listNode* createListOfChildren(inode parent, FILE* ufs){
+	
+	listNode* children = NULL;
+	word i;
+	inode auxNode;
+	for(i=0; i<1024;i++){
+		if (parent.blocks[i]) {
+			auxNode = getInodeFromRelativeAddress(parent.blocks[i], ufs);
+			children = addList(children, auxNode);
+		}
+	}
+	
+	return children;
+}
+

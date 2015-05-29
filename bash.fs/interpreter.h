@@ -16,6 +16,34 @@
 #endif /* defined(__bash_fs__interpreter__) */
 
 
+//------------------- input interpreter --------------//
+typedef enum ExecutionStates{
+	StateFetch1 = 0,
+	StateFetch2 = 1,
+	StateFetch3 = 2,
+	StateExec = 3,
+	StateEnd = 4,
+}execState;
+
+
+typedef enum Instruction{
+	FAIL = -1,
+	LS = 0,
+	CHMOD = 1,
+	MKDIR = 2,
+	CHDIR = 3,
+	RM = 4,
+	Echo = 5,
+	CAT = 6,
+	EXIT = 7,
+	Find = 8,
+	MV = 9,
+	DEFRAG = 10,
+}instruction;
+
+
+//---------------------------------------------------//
+
 
 //used to add a inverted list of the directories
 typedef struct ListNode{
@@ -47,3 +75,5 @@ void printListNames(listNode* list);
 //------------- tasks execution ------------------//
 
 listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs);
+
+listNode* createListOfChildren(inode parent, FILE* ufs);

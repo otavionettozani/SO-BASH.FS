@@ -243,19 +243,46 @@ halfWord createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byt
 	return convertRelativeAddressToAbsoluteAddress(newInode.id);
 }
 
-void deleteInode(inode node, inode* parent, FILE*ufs){
+void deleteInode(inode* node, inode* parent, FILE*ufs){
 	
 	
 	word i =0;
-	while (parent->blocks[i]!=node.id) {
+	
+	if(node->metadata.flags & FlagIsDir){
+		inode child;
+		halfWord childAddr;
+		for(i=0; i<1024;i++){
+			childAddr = node->blocks[i];
+			if(childAddr){
+				child = getInodeFromRelativeAddress(childAddr, ufs);
+				deleteInode(&child, node, ufs);
+			}
+		}
+	}
+	
+	i=0;
+	while (parent->blocks[i]!=node->id) {
 		i++;
 	}
 	
-	setInodeBitmapAsUnused(node, ufs);
+	setInodeBitmapAsUnused(*node, ufs);
 	
 	parent->blocks[i] = (halfWord)0;
 	
+	for (i=0; i<1024; i++) {
+		node->blocks[i]=0;
+	}
+	node->metadata.parent = 0;
+	node->metadata.flags = 0;
+	node->metadata.time = 0;
+	
+	for (i=0;i<256;i++) {
+		node->metadata.name[i]=0;
+	}
 	saveInode(parent, ufs);
+	saveInode(node, ufs);
+	
+	
 	
 }
 
