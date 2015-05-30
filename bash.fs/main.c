@@ -107,7 +107,7 @@ int main(int argc, const char * argv[]) {
 			}else if(inst == LS){
 				children = createListOfChildren(currentDirectory->node, ufs);
 				if(readArguments == 2 && !strcmp(arg1, "-l")){
-					
+					//print with -l flag
 				}else{
 					byte flip = 0;
 					while (children!= NULL) {
@@ -131,6 +131,9 @@ int main(int argc, const char * argv[]) {
 				state = StateEnd;
 			}else if(inst == RM){
 				currentDirectory = removePath(arg1, ufs, currentDirectory);
+				state = StateEnd;
+			}else if(inst == CHMOD){
+				changePermissions(arg2, arg1, ufs, currentDirectory);
 				state = StateEnd;
 			}
 			

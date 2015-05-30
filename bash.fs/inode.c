@@ -191,12 +191,18 @@ void changeInodePermissions(inode* node, byte read, byte write, byte execute){
 	
 	if (read) {
 		setBit(&node->metadata.flags, FlagPmRead);
+	}else{
+		resetBit(&node->metadata.flags, FlagPmRead);
 	}
 	if (write){
 		setBit(&node->metadata.flags, FlagPmWrite);
+	}else{
+		resetBit(&node->metadata.flags, FlagPmWrite);
 	}
 	if (execute){
 		setBit(&node->metadata.flags, FlagPmExec);
+	}else{
+		resetBit(&node->metadata.flags, FlagPmExec);
 	}
 	
 }

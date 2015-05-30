@@ -83,3 +83,6 @@ void createDirectory(char* path, FILE* ufs, listNode* currentDir);
 
 //rm implementation
 listNode* removePath(char* path, FILE* ufs, listNode* currentDir);
+
+//chmod implementation
+void changePermissions(char* path, char* permissions, FILE* ufs, listNode* currentDir);

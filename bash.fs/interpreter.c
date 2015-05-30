@@ -325,3 +325,61 @@ listNode* removePath(char* path, FILE* ufs, listNode* currentDir){
 	return currentDir;
 }
 
+
+
+
+void changePermissions(char* path, char* permissions, FILE* ufs, listNode* currentDir){
+	
+	listNode* list = createListFromString(path, currentDir, ufs);
+	
+	if (list == NULL) {
+		return;
+	}
+	
+	if(list->node.id == 0){
+		printf("Can't change root permissions!\n");
+		return;
+	}
+	
+	if (strlen(permissions)!=3) {
+		printf("Error: Invalid Argument '%s'",permissions);
+		return;
+	}
+	
+	byte read, write, execute;
+	
+	read = permissions[0] == '1' ? 1 : permissions[0] == '0' ? 0 : 2;
+	write = permissions[1] == '1' ? 1 : permissions[1] == '0' ? 0 : 2;
+	execute = permissions[2] == '1' ? 1 : permissions[2] == '0' ? 0 : 2;
+	
+	if(read == 2 || write == 2 || execute == 2){
+		printf("Error: Invalid Argument '%s'",permissions);
+		return;
+	}
+	
+	listNode* aux = currentDir;
+	
+	//find if the desired removed path is with your directory
+	while (aux!= NULL) {
+		if(list->node.id == aux->node.id){
+			break;
+		}
+		aux = aux->next;
+	}
+	
+
+	
+	
+	if(aux!= NULL){
+		changeInodePermissions(&aux->node, read, write, execute);
+		saveInode(&aux->node, ufs);
+	}else{
+		changeInodePermissions(&list->node, read, write, execute);
+		saveInode(&list->node, ufs);
+	}
+	
+	return;
+	
+	
+}
+
