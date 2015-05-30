@@ -71,7 +71,7 @@ int main(int argc, const char * argv[]) {
 				inst = EXIT;
 			}else if(!strcmp(input, "ls")){
 				inst = LS;
-			}else if(!strcmp(input, "chmode")){
+			}else if(!strcmp(input, "chmod")){
 				inst = CHMOD;
 			}else if(!strcmp(input, "mkdir")){
 				inst = MKDIR;
@@ -128,6 +128,9 @@ int main(int argc, const char * argv[]) {
 				state = StateEnd;
 			}else if(inst == MKDIR){
 				createDirectory(arg1, ufs, currentDirectory);
+				state = StateEnd;
+			}else if(inst == RM){
+				currentDirectory = removePath(arg1, ufs, currentDirectory);
 				state = StateEnd;
 			}
 			

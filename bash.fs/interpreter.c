@@ -251,6 +251,10 @@ void createDirectory(char* path, FILE* ufs, listNode* currentDir){
 	
 	listNode* list = createListFromString(path, currentDir, ufs);
 	
+	if(list == NULL){
+		return;
+	}
+	
 	//verify if the parent dir is already at the memory
 	listNode* aux = currentDir;
 	while (aux!= NULL) {
@@ -271,5 +275,53 @@ void createDirectory(char* path, FILE* ufs, listNode* currentDir){
 	
 	return;
 	
+}
+
+listNode* removePath(char* path, FILE* ufs, listNode* currentDir){
+	
+	listNode* list = createListFromString(path, currentDir, ufs);
+	
+	inode removableNode;
+	
+	if (list == NULL) {
+		return currentDir;
+	}
+	if(list->node.id == 0){
+		printf("Can't remove root directory!\n");
+		return currentDir;
+	}
+	
+	listNode* aux = currentDir;
+	
+	//find if the desired removed path is with your directory
+	while (aux!= NULL) {
+		if(list->node.id == aux->node.id){
+			break;
+		}
+		aux = aux->next;
+	}
+	
+	if(aux!= NULL){
+		//remove a file within your current path
+		while (currentDir!=aux) {
+			currentDir = removeList(currentDir);
+		}
+		
+		removableNode = currentDir->node;
+		currentDir = removeList(currentDir);
+		
+		deleteInode(&removableNode, &currentDir->node, ufs);
+		
+		printf("The selected path was removed, it was upper than you in your current path, you got moved to its parent\n");
+		
+	}else{
+		//remove a file beyond your path
+		removableNode = list->node;
+		list = removeList(list);
+		
+		deleteInode(&removableNode, &list->node, ufs);
+	}
+	
+	return currentDir;
 }
 

@@ -72,8 +72,14 @@ void printListNames(listNode* list);
 
 //------------- tasks execution ------------------//
 
+//chdir implementation
 listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs);
 
+//ls implementation
 listNode* createListOfChildren(inode parent, FILE* ufs);
 
+//mkdir implementation
 void createDirectory(char* path, FILE* ufs, listNode* currentDir);
+
+//rm implementation
+listNode* removePath(char* path, FILE* ufs, listNode* currentDir);

@@ -258,6 +258,10 @@ void deleteInode(inode* node, inode* parent, FILE*ufs){
 				deleteInode(&child, node, ufs);
 			}
 		}
+	}else{
+		//is a file, must remove the blocks it occupies
+		
+		
 	}
 	
 	i=0;
