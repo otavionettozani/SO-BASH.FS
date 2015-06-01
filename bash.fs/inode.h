@@ -141,3 +141,9 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 //print all the inode data
 void printInodeData(inode node, halfWord blockSize ,FILE* ufs);
 
+//set the bit relative to the data block as used in the data block bitmap (use relative address)
+void setBlockBitmapAsUsed(halfWord block, FILE* ufs);
+
+//set the bit relative to the data block as unused in the data block bitmap (use relative address)
+void setBlockBitmapAsUnused(halfWord block, FILE* ufs);
+

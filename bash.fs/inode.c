@@ -302,13 +302,13 @@ void deleteInode(inode* node, inode* parent, FILE*ufs){
 word convertBlockRelativeAddressToAbsoluteAddress(halfWord relativeAddress, halfWord blockSize ,FILE* ufs){
 	
 	
-	return SectionDataBlocks + relativeAddress*blockSize;
+	return SectionDataBlocks + (relativeAddress-1)*blockSize;
 	
 }
 
 halfWord convertBlockAbsoluteAddressToRelativeAddress(word absoluteAddress, halfWord blockSize ,FILE* ufs){
 	
-	return ((absoluteAddress-SectionDataBlocks)/blockSize);
+	return ((absoluteAddress-SectionDataBlocks)/blockSize)+1;
 	
 }
 
@@ -321,21 +321,23 @@ word getFreeBlock(FILE* ufs , halfWord blockSize, word maxBlocks){
 	
 	fread(blockBitmap, sizeof(byte), DataBitmapSize, ufs);
 	word i, j, freeBlock = 0;
+	byte found = 0;
 	
 	for (i=0; i<DataBitmapSize; i++) {
 		for (j=0;j<8;j++) {
-			if(!(blockBitmap[i]&1<<j)){
+			if(!(blockBitmap[i]&(1<<j))){
 				freeBlock = i*8+j;
+				found = 1;
 				break;
 			}
 		}
-		if(freeBlock){
+		if(found){
 			break;
 		}
 	}
 	
 	if (freeBlock<maxBlocks) {
-		return freeBlock*blockSize + SectionDataBlocks;
+		return freeBlock*blockSize + SectionDataBlocks+1;
 	}
 	
 	return 0;
@@ -358,17 +360,123 @@ void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord
 }
 
 
+
 void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
 	
 	//clear old data
+	byte* zeros = (byte*) malloc(blockSize*sizeof(byte));
+	word i;
+	for (i=0;i<blockSize;i++) {
+		zeros[i] = 0;
+	}
+	
+	i=0;
+	while (i<1024) {
+		if (node->blocks[i]) {
+			copyBytesToBlock(zeros, blockSize, node->blocks[i], ufs, blockSize, maxBlocks);
+			setBlockBitmapAsUnused(node->blocks[i], ufs);
+			node->blocks[i] = 0;
+		}else{
+			break;
+		}
+		i++;
+	}
+	
+	free(zeros);
 	
 	//get free blocks
+	word blocksQuantity = size/blockSize + ((size%blockSize)!=0);
+	word newBlockAddr;
+	
+	i=0;
+	while (i<blocksQuantity) {
+		newBlockAddr = getFreeBlock(ufs, blockSize, maxBlocks);
+		if (!newBlockAddr) {
+			printf("Error: No free blocks to save the requested data\n");
+			return;
+		}
+		node->blocks[i] = convertBlockAbsoluteAddressToRelativeAddress(newBlockAddr, blockSize, ufs);
+		i++;
+	}
 	
 	//write new data
+	
+	byte* dataPointer;
+	word blockAddr;
+	word writeSize;
+	for (i=0; i<blocksQuantity; i++) {
+		dataPointer=&bytes[i*blockSize];
+		writeSize = blockSize<(size-i*blockSize)?blockSize:(size-i*blockSize);
+		blockAddr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
+		copyBytesToBlock(dataPointer, writeSize, blockAddr, ufs, blockSize, maxBlocks);
+	}
+	
+	//save inode
+	saveInode(node, ufs);
 	
 }
 
 
-void printInodeData(inode node, halfWord blockSize ,FILE* ufs);
+void printInodeData(inode node, halfWord blockSize ,FILE* ufs){
+	
+	word blockAddr;
+	word i = 0, j=0;
+	byte* block = (byte*) malloc(blockSize*sizeof(byte));
+	while (node.blocks[i]) {
+		j = 0;
+		blockAddr = convertBlockRelativeAddressToAbsoluteAddress(node.blocks[i], blockSize, ufs);
+		
+		fseek(ufs, blockAddr, SEEK_SET);
+		fread(block, sizeof(byte), blockSize, ufs);
+		
+		while (j<blockSize && block[j] != 0) {
+			printf("%c",block[j]);
+			j++;
+		}
+		
+		i++;
+		
+	}
+	
+	printf("\n");
+	
+	free(block);
+	
+	return;
+}
+
+void setBlockBitmapAsUsed(halfWord block, FILE* ufs){
+	
+	byte bitmapPosition;
+	word addrByte = SectionDataBitmap + block/8;
+	byte addrBit = block%8;
+	
+	fseek(ufs, addrByte, SEEK_SET);
+	fread(&bitmapPosition, sizeof(byte), 1, ufs);
+	
+	setBit(&bitmapPosition, addrBit);
+	
+	fseek(ufs, addrByte, SEEK_SET);
+	fwrite(&bitmapPosition, sizeof(byte), 1, ufs);
+	
+	return;
+	
+}
+
+void setBlockBitmapAsUnused(halfWord block, FILE* ufs){
+	byte bitmapPosition;
+	word addrByte = SectionDataBitmap + block/8;
+	byte addrBit = block%8;
+	
+	fseek(ufs, addrByte, SEEK_SET);
+	fread(&bitmapPosition, sizeof(byte), 1, ufs);
+	
+	resetBit(&bitmapPosition, addrBit);
+	
+	fseek(ufs, addrByte, SEEK_SET);
+	fwrite(&bitmapPosition, sizeof(byte), 1, ufs);
+	
+	return;
+}
 
 

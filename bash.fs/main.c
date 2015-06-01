@@ -57,6 +57,9 @@ int main(int argc, const char * argv[]) {
 			fgets(buffer, sizeof(buffer), stdin);
 			readArguments = sscanf(buffer,"%s %s %s",input, arg1, arg2);
 			
+			
+			
+			
 			//case arg1 between quotes
 			if (arg1[0]=='"') {
 				
@@ -71,32 +74,47 @@ int main(int argc, const char * argv[]) {
 				sscanf(lastQuote+1,"%s", arg2);
 			}
 			
-			if(!strcmp(input, "exit")){
+			
+			if (buffer[0]=='\n') {
+				state = StateEnd;
+			}else if(!strcmp(input, "exit")){
 				inst = EXIT;
+				state = StateExec;
 			}else if(!strcmp(input, "ls")){
 				inst = LS;
+				state = StateExec;
 			}else if(!strcmp(input, "chmod")){
 				inst = CHMOD;
+				state = StateExec;
 			}else if(!strcmp(input, "mkdir")){
 				inst = MKDIR;
+				state = StateExec;
 			}else if(!strcmp(input, "chdir")){
 				inst = CHDIR;
+				state = StateExec;
 			}else if(!strcmp(input, "rm")){
 				inst = RM;
+				state = StateExec;
 			}else if(!strcmp(input, "echo")){
 				inst = Echo;
+				state = StateExec;
 			}else if(!strcmp(input, "cat")){
 				inst = CAT;
+				state = StateExec;
 			}else if(!strcmp(input, "mv")){
 				inst = MV;
+				state = StateExec;
 			}else if(!strcmp(input, "find")){
 				inst = Find;
+				state = StateExec;
 			}else if(!strcmp(input, "defrag")){
 				inst = DEFRAG;
+				state = StateExec;
 			}else {
 				inst = FAIL;
+				state = StateExec;
 			}
-			state = StateExec;
+			
 			
 		}else if(state == StateExec){
 			if(inst == EXIT){
@@ -139,6 +157,33 @@ int main(int argc, const char * argv[]) {
 			}else if(inst == CHMOD){
 				changePermissions(arg2, arg1, ufs, currentDirectory);
 				state = StateEnd;
+			}else if(inst == Echo){
+				byte bytes[20] = {0};
+				bytes[0] = 'o';
+				bytes[1] = 'i';
+				bytes[2] = ',';
+				bytes[3] = ' ';
+				bytes[4] = 'e';
+				bytes[5] = 'u';
+				bytes[6] = ' ';
+				bytes[7] = 's';
+				bytes[8] = 'o';
+				bytes[9] = 'u';
+				bytes[10] = ' ';
+				bytes[11] = 'o';
+				bytes[12] = ' ';
+				bytes[13] = 'g';
+				bytes[14] = 'o';
+				bytes[15] = 'k';
+				bytes[16] = 'u';
+				createInodeInDirectory(&currentDirectory->node, "fileData", ufs, 1, 1, 1, 0);
+				listNode* asd = createListFromString("fileData", currentDirectory, ufs);
+				setDataToInode(bytes, 20, &asd->node, ufs, blockSize, maxBlocks);
+				
+				state = StateEnd;
+			}else if(inst == CAT){
+				
+				
 			}
 			
 		}else if(state == StateEnd){
