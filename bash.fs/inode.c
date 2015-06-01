@@ -208,6 +208,27 @@ void changeInodePermissions(inode* node, byte read, byte write, byte execute){
 }
 
 
+
+byte directoryHasChildWithName(inode directory, byte* name, FILE* ufs){
+	
+	word i=0;
+	if (!(directory.metadata.flags & FlagIsDir)) {
+		printf("Error: Given inode is not a directory\n");
+		return 2;
+	}
+	while (directory.blocks[i]!=0) {
+		inode node = getInodeFromRelativeAddress(directory.blocks[i], ufs);
+		
+		if (!strcmp((char*)node.metadata.name,(char*)name)) {
+			return 1;
+		}
+		i++;
+	}
+	
+	return 0;
+}
+
+
 word createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory)
 {
@@ -215,7 +236,19 @@ word createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte re
 	inode newInode;
 	word newInodeAddress;
 	
+	if (directoryHasChildWithName(*directory, (byte*)filename,ufs) == 1) {
+		printf("Error: Given name already exists\n");
+		return 0;
+	}else if (directoryHasChildWithName(*directory, (byte*)filename,ufs) == 2){
+		return 0;
+	}
+	
 	newInodeAddress = getFreeInode(ufs);
+	
+	if (!newInodeAddress) {
+		printf("Error: No free inodes found\n");
+		return 0;
+	}
 	
 	newInode = getInodeFromAbsoluteAddress(newInodeAddress, ufs);
 
@@ -383,6 +416,8 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 	}
 	
 	free(zeros);
+	
+	return;
 	
 	//get free blocks
 	word blocksQuantity = size/blockSize + ((size%blockSize)!=0);

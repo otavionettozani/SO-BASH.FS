@@ -86,3 +86,9 @@ listNode* removePath(char* path, FILE* ufs, listNode* currentDir);
 
 //chmod implementation
 void changePermissions(char* path, char* permissions, FILE* ufs, listNode* currentDir);
+
+//echo implementation
+void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE* ufs, listNode* currentDir);
+
+//cat implementation
+void catInode(char* path, word blockSize, FILE* ufs, listNode* currentDir);

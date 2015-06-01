@@ -55,6 +55,9 @@ int main(int argc, const char * argv[]) {
 		
 		if(state == StateFetch){
 			fgets(buffer, sizeof(buffer), stdin);
+			strcpy(input, "");
+			strcpy(arg1, "");
+			strcpy(arg2, "");
 			readArguments = sscanf(buffer,"%s %s %s",input, arg1, arg2);
 			
 			
@@ -158,32 +161,11 @@ int main(int argc, const char * argv[]) {
 				changePermissions(arg2, arg1, ufs, currentDirectory);
 				state = StateEnd;
 			}else if(inst == Echo){
-				byte bytes[20] = {0};
-				bytes[0] = 'o';
-				bytes[1] = 'i';
-				bytes[2] = ',';
-				bytes[3] = ' ';
-				bytes[4] = 'e';
-				bytes[5] = 'u';
-				bytes[6] = ' ';
-				bytes[7] = 's';
-				bytes[8] = 'o';
-				bytes[9] = 'u';
-				bytes[10] = ' ';
-				bytes[11] = 'o';
-				bytes[12] = ' ';
-				bytes[13] = 'g';
-				bytes[14] = 'o';
-				bytes[15] = 'k';
-				bytes[16] = 'u';
-				createInodeInDirectory(&currentDirectory->node, "fileData", ufs, 1, 1, 1, 0);
-				listNode* asd = createListFromString("fileData", currentDirectory, ufs);
-				setDataToInode(bytes, 20, &asd->node, ufs, blockSize, maxBlocks);
-				
+				echoToInode(arg2, arg1, blockSize, maxBlocks, ufs, currentDirectory);
 				state = StateEnd;
 			}else if(inst == CAT){
-				
-				
+				catInode(arg1, blockSize, ufs, currentDirectory);
+				state = StateEnd;
 			}
 			
 		}else if(state == StateEnd){

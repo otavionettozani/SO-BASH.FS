@@ -120,6 +120,8 @@ void setInodeBitmapAsUsed(inode node, FILE* ufs);
 //set the bit relative to the inode as unused in the inode bitmap
 void setInodeBitmapAsUnused(inode node, FILE* ufs);
 
+//returns 1 if dir has a child with the name or 0 if not. Returns 2 if node is not a directory
+byte directoryHasChildWithName(inode directory, byte* name, FILE* ufs);
 
 //-------------- Blocks ----------//
 

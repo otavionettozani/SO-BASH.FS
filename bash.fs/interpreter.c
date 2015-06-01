@@ -380,6 +380,95 @@ void changePermissions(char* path, char* permissions, FILE* ufs, listNode* curre
 	
 	return;
 	
+}
+
+
+void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE* ufs, listNode* currentDir){
+	
+	char* lastBar;
+	char nameCopy[256]={0};
+	lastBar = strrchr(path, '/');
+	
+	if (lastBar) {
+		strcpy(nameCopy, lastBar+sizeof(char));
+		
+		if(lastBar!=path){
+			lastBar[0] = 0;
+		}else{
+			lastBar[1]=0;
+		}
+	}else{
+		strcpy(nameCopy, path);
+		path[0] = 0;
+	}
+	
+	
+	listNode* list = createListFromString(path, currentDir, ufs);
+	
+	listNode* aux = currentDir;
+	
+	if(list == NULL){
+		return;
+	}
+	
+	//find if the desired path is parent of your directory
+	while (aux!= NULL) {
+		if(list->node.id == aux->node.id){
+			break;
+		}
+		aux = aux->next;
+	}
+	//if desired path is not within your current path
+	if (aux == NULL) {
+		aux = list;
+	}
+	
+	
+	word dataSize = strlen(message);
+	
+	if(directoryHasChildWithName(aux->node, (byte*)nameCopy, ufs)==1){
+		inode* node;
+		listNode* fileNode = createListFromString(nameCopy, aux, ufs);
+		node = &fileNode->node;
+		while (fileNode != NULL) {
+			fileNode = removeList(fileNode);
+		}
+		setDataToInode((byte*)message, dataSize, node, ufs, blockSize, maxBlocks);
+	}else if(directoryHasChildWithName(aux->node, (byte*)nameCopy, ufs)==0){
+		inode node;
+		word addr = createInodeInDirectory(&aux->node, nameCopy, ufs, 1, 1, 1, 0);
+		node = getInodeFromAbsoluteAddress(addr, ufs);
+		setDataToInode((byte*)message, dataSize, &node, ufs, blockSize, maxBlocks);
+	}
+	
+	
+	while (list != NULL) {
+		list = removeList(list);
+	}
+	
 	
 }
 
+
+void catInode(char* path, word blockSize, FILE* ufs, listNode* currentDir){
+	
+	listNode* list =createListFromString(path, currentDir, ufs);
+	
+	if (list==NULL) {
+		return;
+	}
+	
+	if(list->node.metadata.flags & FlagIsDir){
+		printf("%s is a directory!\n",list->node.metadata.name);
+		while (list != NULL) {
+			list = removeList(list);
+		}
+		return;
+	}
+	
+	printInodeData(list->node, blockSize, ufs);
+	
+	while (list != NULL) {
+		list = removeList(list);
+	}
+}
