@@ -10,7 +10,7 @@
 #include "interpreter.h"
 #include <stdlib.h>
 
-#define FILE_SIZE 1024*1024*24
+#define FILE_SIZE (1024*1024*24)
 
 
 
@@ -21,41 +21,30 @@ int main(int argc, const char * argv[]) {
 	//test purposes
 	const char filename[255] = "arquivo_fs";
 	
+	
+	//end of test purposes
+	
 	FILE* ufs = fopen(filename, "r+");
 	
+	superBlock sBlock;
+	
+	fseek(ufs, SectionSuperBlock, SEEK_SET);
+	
+	fread(&sBlock, sizeof(superBlock), 1, ufs);
+	
 	inode root = getInodeFromRelativeAddress(0, ufs);
+	
 	
 	listNode* currentDirectory = NULL;
 	
 	currentDirectory = addList(currentDirectory, root);
 	
-	/*
-	createInodeInDirectory(&root,"name_of_file3", ufs, 1, 1, 1, 1);
-	inode a = getInodeFromRelativeAddress(1, ufs);
+	halfWord blockSize = sBlock.magicNumber;
 	
-	halfWord b = seekInDirectory(root, "name_of_file3", ufs);
-	
-	if(b){
-		inode deletable = getInodeFromAbsoluteAddress(b, ufs);
-		deleteInode(deletable, &root,ufs);
-	}
+	halfWord maxBlocks = (FILE_SIZE - SectionDataBlocks)/blockSize;
 	
 	
-	
-	currentDirectory = changeCurrentDirectory("name_of_file3", currentDirectory, ufs);
-	
-	//createInodeInDirectory(&currentDirectory->node, "sub_dir", ufs, 1, 1, 1, 1);
-	
-	currentDirectory = changeCurrentDirectory("sub_dir", currentDirectory, ufs);
-	
-	currentDirectory = changeCurrentDirectory("../sub_dir", currentDirectory, ufs);
-	
-	printListNames(currentDirectory);
-	
-	 */
-	
-	//end of test purposes
-	
+	//--------------------------  BASH MODE ----------------------------------//
 	char input[10], arg1[1024], arg2[1024], buffer[2058];
 	byte readArguments = 0;
 	execState state = StateEnd;
@@ -67,6 +56,21 @@ int main(int argc, const char * argv[]) {
 		if(state == StateFetch){
 			fgets(buffer, sizeof(buffer), stdin);
 			readArguments = sscanf(buffer,"%s %s %s",input, arg1, arg2);
+			
+			//case arg1 between quotes
+			if (arg1[0]=='"') {
+				
+				char* firstQuote = strchr(buffer, '"');
+				char* lastQuote = strrchr(buffer, '"');
+				word firstQuotePos = firstQuote-buffer+1, lastQuotePos = lastQuote-buffer;
+				word counter;
+				for (counter = firstQuotePos;counter<lastQuotePos;counter++) {
+					arg1[counter-firstQuotePos] = buffer[counter];
+				}
+				arg1[counter] = 0;
+				sscanf(lastQuote+1,"%s", arg2);
+			}
+			
 			if(!strcmp(input, "exit")){
 				inst = EXIT;
 			}else if(!strcmp(input, "ls")){

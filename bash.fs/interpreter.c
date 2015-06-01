@@ -60,7 +60,7 @@ listNode* createListFromString(char* string, listNode*root, FILE* ufs){
 	
 	listNode* list = NULL;
 	inode aux;
-	halfWord auxAddr;
+	word auxAddr;
 	
 	if(string[0]=='/'){
 		aux = getInodeFromRelativeAddress(0,ufs);
@@ -293,7 +293,7 @@ listNode* removePath(char* path, FILE* ufs, listNode* currentDir){
 	
 	listNode* aux = currentDir;
 	
-	//find if the desired removed path is with your directory
+	//find if the desired removed path is parent of your directory
 	while (aux!= NULL) {
 		if(list->node.id == aux->node.id){
 			break;
@@ -359,7 +359,7 @@ void changePermissions(char* path, char* permissions, FILE* ufs, listNode* curre
 	
 	listNode* aux = currentDir;
 	
-	//find if the desired removed path is with your directory
+	//find if the desired path is parent of your directory
 	while (aux!= NULL) {
 		if(list->node.id == aux->node.id){
 			break;

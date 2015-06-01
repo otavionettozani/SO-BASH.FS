@@ -26,19 +26,19 @@ void resetBit(byte* destination, byte bit){
 //------------inode use functions--------------//
 
 
-halfWord convertRelativeAddressToAbsoluteAddress(halfWord relativeAddress){
+word convertRelativeAddressToAbsoluteAddress(halfWord relativeAddress){
 	return SectionInodes + relativeAddress*sizeof(inode);
 }
 
 
-halfWord convertAbsoluteAddressToRelativeAddress(halfWord absoluteAddress){
+halfWord convertAbsoluteAddressToRelativeAddress(word absoluteAddress){
 	return (absoluteAddress - SectionInodes)/sizeof(inode);
 }
 
 
 inode getInodeFromRelativeAddress(halfWord address, FILE* ufs){
 	
-	halfWord absoluteAddress = convertRelativeAddressToAbsoluteAddress(address);
+	word absoluteAddress = convertRelativeAddressToAbsoluteAddress(address);
 	
 	inode node;
 	
@@ -50,7 +50,7 @@ inode getInodeFromRelativeAddress(halfWord address, FILE* ufs){
 	
 }
 
-inode getInodeFromAbsoluteAddress(halfWord address, FILE* ufs){
+inode getInodeFromAbsoluteAddress(word address, FILE* ufs){
 	
 	inode node;
 	
@@ -63,7 +63,7 @@ inode getInodeFromAbsoluteAddress(halfWord address, FILE* ufs){
 }
 
 
-halfWord getFreeInode(FILE* ufs){
+word getFreeInode(FILE* ufs){
 	
 	byte inodeBitmap[InodeBitmapSize];
 	int i,j,k;
@@ -141,7 +141,7 @@ void setInodeBitmapAsUnused(inode node, FILE* ufs){
 }
 
 
-halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
+word seekInDirectory(inode directory, char* fileName, FILE* ufs){
 	
 	if (!(directory.metadata.flags & FlagIsDir)) {
 		printf("Error in 'seekInDirectory': the given Inode is not a directory\n");
@@ -173,7 +173,7 @@ halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs){
 
 void saveInode(inode* node, FILE* ufs){
 	
-	halfWord absolutePosition = convertRelativeAddressToAbsoluteAddress(node->id);
+	word absolutePosition = convertRelativeAddressToAbsoluteAddress(node->id);
 	
 	fseek(ufs, absolutePosition, SEEK_SET);
 	
@@ -208,12 +208,12 @@ void changeInodePermissions(inode* node, byte read, byte write, byte execute){
 }
 
 
-halfWord createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte read,
+word createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory)
 {
 	//create the new inode
 	inode newInode;
-	halfWord newInodeAddress;
+	word newInodeAddress;
 	
 	newInodeAddress = getFreeInode(ufs);
 	

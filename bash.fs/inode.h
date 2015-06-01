@@ -84,19 +84,19 @@ typedef enum Sections{
 
 
 //returns the absolute address given the relative address
-halfWord convertRelativeAddressToAbsoluteAddress(halfWord relativeAddress);
+word convertRelativeAddressToAbsoluteAddress(halfWord relativeAddress);
 
 //returns the relative address given the absolute address
-halfWord convertAbsoluteAddressToRelativeAddress(halfWord absoluteAddress);
+halfWord convertAbsoluteAddressToRelativeAddress(word absoluteAddress);
 
 //returns an inode from the given relative address
 inode getInodeFromRelativeAddress(halfWord address, FILE* ufs);
 
 //returns an inode from the given relative address
-inode getInodeFromAbsoluteAddress(halfWord address, FILE* ufs);
+inode getInodeFromAbsoluteAddress(word address, FILE* ufs);
 
 //returns the absolute address of the first free inode that it founds
-halfWord getFreeInode(FILE* ufs);
+word getFreeInode(FILE* ufs);
 
 //save the inode in its position, also, update the time of modification of this node.
 void saveInode(inode* node, FILE* ufs);
@@ -105,10 +105,10 @@ void saveInode(inode* node, FILE* ufs);
 void changeInodePermissions(inode* node, byte read, byte write, byte execute);
 
 //returns 0 if cant find the requested inode or a halfword containing the absolute address of the requested inode
-halfWord seekInDirectory(inode directory, char* fileName, FILE* ufs);
+word seekInDirectory(inode directory, char* fileName, FILE* ufs);
 
 //tries to create a new inode at the given directory and returns its absolute address. if fails returns 0
-halfWord createInodeInDirectory(inode* directory,char* filename, FILE* ufs, byte read,
+word createInodeInDirectory(inode* directory,char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory);
 
 //delete the selected inode
@@ -119,4 +119,25 @@ void setInodeBitmapAsUsed(inode node, FILE* ufs);
 
 //set the bit relative to the inode as unused in the inode bitmap
 void setInodeBitmapAsUnused(inode node, FILE* ufs);
+
+
+//-------------- Blocks ----------//
+
+//converts from relative to absolute address the block address
+word convertBlockRelativeAddressToAbsoluteAddress(halfWord relativeAddress);
+
+//returns the relative address given the absolute address
+halfWord convertBlockAbsoluteAddressToRelativeAddress(word absoluteAddress);
+
+//returns the absolute address of the desired block
+word getFreeBlock(FILE* ufs, word maxBlocks);
+
+//copy the given bytes to the block
+void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, word maxBlocks);
+
+//set the given data to the given inode
+void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, word maxBlocks);
+
+//print all the inode data
+void printInodeData(inode node, FILE* ufs);
 
