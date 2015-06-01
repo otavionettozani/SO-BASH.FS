@@ -149,7 +149,7 @@ int main(int argc, const char * argv[]) {
 				createDirectory(arg1, ufs, currentDirectory);
 				state = StateEnd;
 			}else if(inst == RM){
-				currentDirectory = removePath(arg1, ufs, currentDirectory);
+				currentDirectory = removePath(arg1, ufs, currentDirectory, blockSize, maxBlocks);
 				state = StateEnd;
 			}else if(inst == CHMOD){
 				changePermissions(arg2, arg1, ufs, currentDirectory);

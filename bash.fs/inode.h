@@ -112,7 +112,7 @@ word createInodeInDirectory(inode* directory,char* filename, FILE* ufs, byte rea
 							byte write, byte execute, byte isDirectory);
 
 //delete the selected inode
-void deleteInode(inode* node,inode* parent,FILE*ufs);
+void deleteInode(inode* node,inode* parent, halfWord blockSize, word maxBlocks,FILE*ufs);
 
 //set the bit relative to the inode as used in the inode bitmap
 void setInodeBitmapAsUsed(inode node, FILE* ufs);

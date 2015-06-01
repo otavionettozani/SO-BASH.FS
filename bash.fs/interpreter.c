@@ -277,7 +277,7 @@ void createDirectory(char* path, FILE* ufs, listNode* currentDir){
 	
 }
 
-listNode* removePath(char* path, FILE* ufs, listNode* currentDir){
+listNode* removePath(char* path, FILE* ufs, listNode* currentDir, halfWord blockSize, word maxBlocks){
 	
 	listNode* list = createListFromString(path, currentDir, ufs);
 	
@@ -310,7 +310,7 @@ listNode* removePath(char* path, FILE* ufs, listNode* currentDir){
 		removableNode = currentDir->node;
 		currentDir = removeList(currentDir);
 		
-		deleteInode(&removableNode, &currentDir->node, ufs);
+		deleteInode(&removableNode, &currentDir->node, blockSize, maxBlocks, ufs);
 		
 		printf("The selected path was removed, it was upper than you in your current path, you got moved to its parent\n");
 		
@@ -319,7 +319,23 @@ listNode* removePath(char* path, FILE* ufs, listNode* currentDir){
 		removableNode = list->node;
 		list = removeList(list);
 		
-		deleteInode(&removableNode, &list->node, ufs);
+		//find if parent node is with your path
+		listNode* parent = currentDir;
+		while (parent!= NULL) {
+			if(list->node.id == parent->node.id){
+				break;
+			}
+			parent = parent->next;
+		}
+		
+		//parent is not with your directory
+		if (parent == NULL) {
+			deleteInode(&removableNode, &list->node, blockSize, maxBlocks, ufs);
+		}else{
+			//parent is with your path
+			deleteInode(&removableNode, &parent->node, blockSize, maxBlocks, ufs);
+		}
+		
 	}
 	
 	return currentDir;

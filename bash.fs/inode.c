@@ -282,7 +282,7 @@ word createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte re
 	return convertRelativeAddressToAbsoluteAddress(newInode.id);
 }
 
-void deleteInode(inode* node, inode* parent, FILE*ufs){
+void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks, FILE*ufs){
 	
 	
 	word i =0;
@@ -294,12 +294,31 @@ void deleteInode(inode* node, inode* parent, FILE*ufs){
 			childAddr = node->blocks[i];
 			if(childAddr){
 				child = getInodeFromRelativeAddress(childAddr, ufs);
-				deleteInode(&child, node, ufs);
+				deleteInode(&child, node,blockSize,maxBlocks, ufs);
 			}
 		}
 	}else{
 		//is a file, must remove the blocks it occupies
+		byte* zeros = (byte*) malloc(blockSize*sizeof(byte));
+		word i;
+		for (i=0;i<blockSize;i++) {
+			zeros[i] = 0;
+		}
 		
+		i=0;
+		while (i<1024) {
+			if (node->blocks[i]) {
+				word addr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
+				copyBytesToBlock(zeros, blockSize, addr, ufs, blockSize, maxBlocks);
+				setBlockBitmapAsUnused(node->blocks[i], ufs);
+				node->blocks[i] = 0;
+			}else{
+				break;
+			}
+			i++;
+		}
+		
+		free(zeros);
 		
 	}
 	
@@ -413,7 +432,7 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 		if (node->blocks[i]) {
 			word addr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
 			copyBytesToBlock(zeros, blockSize, addr, ufs, blockSize, maxBlocks);
-			setBlockBitmapAsUnused(addr, ufs);
+			setBlockBitmapAsUnused(node->blocks[i], ufs);
 			node->blocks[i] = 0;
 		}else{
 			break;
@@ -449,7 +468,7 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 		writeSize = blockSize<(size-i*blockSize)?blockSize:(size-i*blockSize);
 		blockAddr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
 		copyBytesToBlock(dataPointer, writeSize, blockAddr, ufs, blockSize, maxBlocks);
-		setBlockBitmapAsUsed(blockAddr, ufs);
+		setBlockBitmapAsUsed(node->blocks[i], ufs);
 	}
 	
 	//save inode
@@ -464,6 +483,7 @@ void printInodeData(inode node, halfWord blockSize ,FILE* ufs){
 	word i = 0, j=0;
 	byte* block = (byte*) malloc(blockSize*sizeof(byte));
 	while (node.blocks[i]) {
+		
 		j = 0;
 		blockAddr = convertBlockRelativeAddressToAbsoluteAddress(node.blocks[i], blockSize, ufs);
 		
