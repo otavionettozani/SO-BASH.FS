@@ -65,16 +65,10 @@ int main(int argc, const char * argv[]) {
 			
 			//case arg1 between quotes
 			if (arg1[0]=='"') {
-				
-				char* firstQuote = strchr(buffer, '"');
-				char* lastQuote = strrchr(buffer, '"');
-				word firstQuotePos = firstQuote-buffer+1, lastQuotePos = lastQuote-buffer;
-				word counter;
-				for (counter = firstQuotePos;counter<lastQuotePos;counter++) {
-					arg1[counter-firstQuotePos] = buffer[counter];
+				sscanf(buffer, "%s \"%[^\"]\" %s",input,arg1,arg2);
+				if(arg1[0]==arg1[1] && arg1[0] == '"'){
+					arg1[0] = arg1[1] = 0;
 				}
-				arg1[counter] = 0;
-				sscanf(lastQuote+1,"%s", arg2);
 			}
 			
 			

@@ -134,7 +134,7 @@ halfWord convertBlockAbsoluteAddressToRelativeAddress(word absoluteAddress, half
 //returns the absolute address of the desired block
 word getFreeBlock(FILE* ufs , halfWord blockSize, word maxBlocks);
 
-//copy the given bytes to the block (give the absolute address of the block
+//copy the given bytes to the block (give the absolute address of the block)
 void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord blockSize ,word maxBlocks);
 
 //set the given data to the given inode

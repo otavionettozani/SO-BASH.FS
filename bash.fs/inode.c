@@ -411,8 +411,9 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 	i=0;
 	while (i<1024) {
 		if (node->blocks[i]) {
-			copyBytesToBlock(zeros, blockSize, node->blocks[i], ufs, blockSize, maxBlocks);
-			setBlockBitmapAsUnused(node->blocks[i], ufs);
+			word addr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
+			copyBytesToBlock(zeros, blockSize, addr, ufs, blockSize, maxBlocks);
+			setBlockBitmapAsUnused(addr, ufs);
 			node->blocks[i] = 0;
 		}else{
 			break;
@@ -448,6 +449,7 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 		writeSize = blockSize<(size-i*blockSize)?blockSize:(size-i*blockSize);
 		blockAddr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
 		copyBytesToBlock(dataPointer, writeSize, blockAddr, ufs, blockSize, maxBlocks);
+		setBlockBitmapAsUsed(blockAddr, ufs);
 	}
 	
 	//save inode

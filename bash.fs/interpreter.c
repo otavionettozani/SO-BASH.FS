@@ -430,10 +430,10 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 		inode* node;
 		listNode* fileNode = createListFromString(nameCopy, aux, ufs);
 		node = &fileNode->node;
+		setDataToInode((byte*)message, dataSize, node, ufs, blockSize, maxBlocks);
 		while (fileNode != NULL) {
 			fileNode = removeList(fileNode);
 		}
-		setDataToInode((byte*)message, dataSize, node, ufs, blockSize, maxBlocks);
 	}else if(directoryHasChildWithName(aux->node, (byte*)nameCopy, ufs)==0){
 		inode node;
 		word addr = createInodeInDirectory(&aux->node, nameCopy, ufs, 1, 1, 1, 0);
