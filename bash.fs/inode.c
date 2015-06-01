@@ -396,6 +396,11 @@ void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord
 
 void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
 	
+	if ((node->metadata.flags & FlagIsDir)) {
+		printf("Error: Can't allocate blocks to directory!");
+		return;
+	}
+	
 	//clear old data
 	byte* zeros = (byte*) malloc(blockSize*sizeof(byte));
 	word i;
@@ -417,7 +422,6 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 	
 	free(zeros);
 	
-	return;
 	
 	//get free blocks
 	word blocksQuantity = size/blockSize + ((size%blockSize)!=0);
