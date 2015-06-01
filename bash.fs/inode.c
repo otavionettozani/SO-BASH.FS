@@ -7,7 +7,7 @@
 //
 
 #include "inode.h"
-
+#include <stdlib.h>
 
 
 //--------------- auxiliar funcions--------------------//
@@ -295,4 +295,80 @@ void deleteInode(inode* node, inode* parent, FILE*ufs){
 	
 	
 }
+
+
+//----------------------- Blocks -----------------------//
+
+word convertBlockRelativeAddressToAbsoluteAddress(halfWord relativeAddress, halfWord blockSize ,FILE* ufs){
+	
+	
+	return SectionDataBlocks + relativeAddress*blockSize;
+	
+}
+
+halfWord convertBlockAbsoluteAddressToRelativeAddress(word absoluteAddress, halfWord blockSize ,FILE* ufs){
+	
+	return ((absoluteAddress-SectionDataBlocks)/blockSize);
+	
+}
+
+word getFreeBlock(FILE* ufs , halfWord blockSize, word maxBlocks){
+	
+	
+	byte blockBitmap[DataBitmapSize];
+	
+	fseek(ufs, SectionDataBitmap, SEEK_SET);
+	
+	fread(blockBitmap, sizeof(byte), DataBitmapSize, ufs);
+	word i, j, freeBlock = 0;
+	
+	for (i=0; i<DataBitmapSize; i++) {
+		for (j=0;j<8;j++) {
+			if(!(blockBitmap[i]&1<<j)){
+				freeBlock = i*8+j;
+				break;
+			}
+		}
+		if(freeBlock){
+			break;
+		}
+	}
+	
+	if (freeBlock<maxBlocks) {
+		return freeBlock*blockSize + SectionDataBlocks;
+	}
+	
+	return 0;
+	
+}
+
+void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord blockSize ,word maxBlocks){
+	
+	if (size>blockSize) {
+		printf("Error: size of requested data is bigger than the size of the block\n");
+		return;
+	}
+	
+	fseek(ufs, block, SEEK_SET);
+	
+	fwrite(bytes, sizeof(byte), size, ufs);
+	
+	return;
+	
+}
+
+
+void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
+	
+	//clear old data
+	
+	//get free blocks
+	
+	//write new data
+	
+}
+
+
+void printInodeData(inode node, halfWord blockSize ,FILE* ufs);
+
 

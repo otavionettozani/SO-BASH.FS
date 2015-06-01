@@ -124,20 +124,20 @@ void setInodeBitmapAsUnused(inode node, FILE* ufs);
 //-------------- Blocks ----------//
 
 //converts from relative to absolute address the block address
-word convertBlockRelativeAddressToAbsoluteAddress(halfWord relativeAddress);
+word convertBlockRelativeAddressToAbsoluteAddress(halfWord relativeAddress, halfWord blockSize ,FILE* ufs);
 
 //returns the relative address given the absolute address
-halfWord convertBlockAbsoluteAddressToRelativeAddress(word absoluteAddress);
+halfWord convertBlockAbsoluteAddressToRelativeAddress(word absoluteAddress, halfWord blockSize ,FILE* ufs);
 
 //returns the absolute address of the desired block
-word getFreeBlock(FILE* ufs, word maxBlocks);
+word getFreeBlock(FILE* ufs , halfWord blockSize, word maxBlocks);
 
-//copy the given bytes to the block
-void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, word maxBlocks);
+//copy the given bytes to the block (give the absolute address of the block
+void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord blockSize ,word maxBlocks);
 
 //set the given data to the given inode
-void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, word maxBlocks);
+void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks);
 
 //print all the inode data
-void printInodeData(inode node, FILE* ufs);
+void printInodeData(inode node, halfWord blockSize ,FILE* ufs);
 
