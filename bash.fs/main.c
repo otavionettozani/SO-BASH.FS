@@ -171,6 +171,54 @@ int main(int argc, const char * argv[]) {
 		//-------------------------- MODE OUTPUT -------------------------------//
 		FILE* external = fopen(destinationFileName, "w");
 		
+		listNode* list = createListFromString(sourceFileName, currentDirectory, ufs);
+		
+		if(list == NULL){
+			printf("Source Path does no exists!\n");
+			fclose(external);
+			fclose(ufs);
+			return 0;
+		}
+		
+		if (list->node.metadata.flags&FlagIsDir) {
+			printf("Source Path is a directory!\n");
+			fclose(external);
+			fclose(ufs);
+			return 0;
+		}
+		
+		if (!(list->node.metadata.flags&FlagPmRead)) {
+			printf("Permission Denied!\n");
+			fclose(external);
+			fclose(ufs);
+			return 0;
+		}
+		
+		word i = 0, j;
+		byte* readByte = (byte*) malloc(blockSize*sizeof(byte));
+		while (list->node.blocks[i] && i<1024) {
+			
+			word addr =	convertBlockRelativeAddressToAbsoluteAddress(list->node.blocks[i], blockSize, ufs);
+			fseek(ufs, addr, SEEK_SET);
+			
+			
+			
+			fread(readByte, sizeof(byte), blockSize, ufs);
+			
+			j=0;
+			while (readByte[j] && j<blockSize) {
+				j++;
+			}
+			
+			fwrite(readByte, sizeof(byte), j, external);
+			
+			i++;
+		}
+		
+		free(readByte);
+		
+		
+		fclose(external);
 		fclose(ufs);
 		return 0;
 	}
