@@ -455,6 +455,7 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 			return;
 		}
 		node->blocks[i] = convertBlockAbsoluteAddressToRelativeAddress(newBlockAddr, blockSize, ufs);
+		setBlockBitmapAsUsed(node->blocks[i], ufs);
 		i++;
 	}
 	
@@ -468,7 +469,6 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 		writeSize = blockSize<(size-i*blockSize)?blockSize:(size-i*blockSize);
 		blockAddr = convertBlockRelativeAddressToAbsoluteAddress(node->blocks[i], blockSize, ufs);
 		copyBytesToBlock(dataPointer, writeSize, blockAddr, ufs, blockSize, maxBlocks);
-		setBlockBitmapAsUsed(node->blocks[i], ufs);
 	}
 	
 	//save inode

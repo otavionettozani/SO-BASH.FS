@@ -10,7 +10,7 @@ TODO
 Bash.sh:
 
 
-Comandos -i -o e -d
+Comandos -o e -d
 
 
 =====Interno ao -b========
