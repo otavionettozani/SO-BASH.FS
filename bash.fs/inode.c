@@ -515,7 +515,7 @@ void setBlockBitmapAsUsed(halfWord block, FILE* ufs){
 	fseek(ufs, addrByte, SEEK_SET);
 	fread(&bitmapPosition, sizeof(byte), 1, ufs);
 	
-	setBit(&bitmapPosition, addrBit);
+	setBit(&bitmapPosition, (1<<(addrBit-1)));
 	
 	fseek(ufs, addrByte, SEEK_SET);
 	fwrite(&bitmapPosition, sizeof(byte), 1, ufs);
@@ -532,7 +532,7 @@ void setBlockBitmapAsUnused(halfWord block, FILE* ufs){
 	fseek(ufs, addrByte, SEEK_SET);
 	fread(&bitmapPosition, sizeof(byte), 1, ufs);
 	
-	resetBit(&bitmapPosition, addrBit);
+	resetBit(&bitmapPosition, (1<<(addrBit-1)));
 	
 	fseek(ufs, addrByte, SEEK_SET);
 	fwrite(&bitmapPosition, sizeof(byte), 1, ufs);

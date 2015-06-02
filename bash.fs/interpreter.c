@@ -174,6 +174,22 @@ listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs){
 		return currentDir;
 	}
 	
+	if(!(list2->node.metadata.flags & FlagPmExec)){
+		printf("Error: Permission Denied!\n");
+		while (list2!= NULL) {
+			list2 = removeList(list2);
+		}
+		return currentDir;
+	}
+	
+	if(!(list2->node.metadata.flags & FlagIsDir)){
+		printf("Error: Given path is a file!\n");
+		while (list2!= NULL) {
+			list2 = removeList(list2);
+		}
+		return currentDir;
+	}
+	
 	aux = list2;
 	
 	while (aux->next!=NULL) {
@@ -213,6 +229,17 @@ listNode* changeCurrentDirectory(char* path, listNode* currentDir, FILE* ufs){
 
 
 listNode* createListOfChildren(inode parent, FILE* ufs){
+	
+	
+	if (!(parent.metadata.flags & FlagIsDir)) {
+		printf("Error: Given path is a file!");
+		return NULL;
+	}
+	
+	if (!(parent.metadata.flags & FlagPmRead)) {
+		printf("Error: Permission Denied!");
+		return NULL;
+	}
 	
 	listNode* children = NULL;
 	word i;
@@ -265,8 +292,40 @@ void createDirectory(char* path, FILE* ufs, listNode* currentDir){
 	}
 	
 	if(!aux){
+		if (!(list->node.metadata.flags&FlagPmWrite)) {
+			printf("Error: Permission Denied\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			return;
+		}
+		
+		if (!(list->node.metadata.flags&FlagIsDir)) {
+			printf("Error: Can't create child of a file\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			return;
+		}
+		
 		createInodeInDirectory(&list->node, nameCopy, ufs, 1, 1, 1, 1);
 	}else{
+		if (!(aux->node.metadata.flags&FlagPmWrite)) {
+			printf("Error: Permission Denied\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			return;
+		}
+		
+		if (!(aux->node.metadata.flags&FlagIsDir)) {
+			printf("Error: Can't create child of a file\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			return;
+		}
+		
 		createInodeInDirectory(&aux->node, nameCopy, ufs, 1, 1, 1, 1);
 	}
 	while (list != NULL) {
@@ -446,12 +505,46 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 		inode* node;
 		listNode* fileNode = createListFromString(nameCopy, aux, ufs);
 		node = &fileNode->node;
+		
+		
+		if (node->metadata.flags&FlagIsDir) {
+			printf("Error: Can't write to a directory\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			while (fileNode != NULL) {
+				fileNode = removeList(fileNode);
+			}
+			return;
+		}
+		
+		
+		if(!(node->metadata.flags&FlagPmWrite)){
+			printf("Error: Permission Denied!\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			while (fileNode != NULL) {
+				fileNode = removeList(fileNode);
+			}
+			return;
+		}
+		
 		setDataToInode((byte*)message, dataSize, node, ufs, blockSize, maxBlocks);
 		while (fileNode != NULL) {
 			fileNode = removeList(fileNode);
 		}
 	}else if(directoryHasChildWithName(aux->node, (byte*)nameCopy, ufs)==0){
 		inode node;
+		
+		if(!(aux->node.metadata.flags&FlagPmWrite)){
+			printf("Error: Permission Denied!\n");
+			while (list != NULL) {
+				list = removeList(list);
+			}
+			return;
+		}
+		
 		word addr = createInodeInDirectory(&aux->node, nameCopy, ufs, 1, 1, 1, 0);
 		node = getInodeFromAbsoluteAddress(addr, ufs);
 		setDataToInode((byte*)message, dataSize, &node, ufs, blockSize, maxBlocks);
@@ -471,6 +564,14 @@ void catInode(char* path, word blockSize, FILE* ufs, listNode* currentDir){
 	listNode* list =createListFromString(path, currentDir, ufs);
 	
 	if (list==NULL) {
+		return;
+	}
+	
+	if (!(list->node.metadata.flags&FlagPmRead)) {
+		printf("Error: Permission Denied!\n");
+		while (list != NULL) {
+			list = removeList(list);
+		}
 		return;
 	}
 	

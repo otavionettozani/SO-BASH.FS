@@ -13,9 +13,6 @@
 #define FILE_SIZE (1024*1024*24)
 
 
-
-
-
 int main(int argc, const char * argv[]) {
 	
 	//test purposes
@@ -55,9 +52,16 @@ int main(int argc, const char * argv[]) {
 		
 		if(state == StateFetch){
 			fgets(buffer, sizeof(buffer), stdin);
-			strcpy(input, "");
-			strcpy(arg1, "");
-			strcpy(arg2, "");
+			word i;
+			for (i=0; i<10; i++) {
+				input[i] = 0;
+			}
+			for (i=0; i<1024; i++) {
+				arg1[i] = 0;
+				arg2[i] = 0;
+			}
+			
+			
 			readArguments = sscanf(buffer,"%s %s %s",input, arg1, arg2);
 			
 			
@@ -163,10 +167,14 @@ int main(int argc, const char * argv[]) {
 			}
 			
 		}else if(state == StateEnd){
+			
 			printf("\n\n");
 			printListNames(currentDirectory);
 			printf(" $: ");
 			state = StateFetch;
+			
+			
+			
 		}
 		
 	}
