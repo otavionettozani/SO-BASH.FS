@@ -215,6 +215,9 @@ int main(int argc, const char * argv[]) {
 			i++;
 		}
 		
+		printf("File Copied successfully!\n");
+		
+		
 		free(readByte);
 		
 		
@@ -238,6 +241,13 @@ int main(int argc, const char * argv[]) {
 		execState state = StateEnd;
 		instruction inst = FAIL;
 		listNode* children;
+		
+		printf("Welcome to Bash Mode\n");
+		printf("Here you can use many comands in order to access your UFS\n");
+		printf("We support more than one access level for all instructions except ls\n");
+		printf("We support name of files and directories up to 255 character\n");
+		printf("Supported commands:\n");
+		printf("ls(-l)\tmkdir\tchdir\trmdir\techo\tcat\tchmod\texit\n");
 		
 		while (1) {
 			
