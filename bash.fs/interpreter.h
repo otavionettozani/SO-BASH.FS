@@ -92,3 +92,6 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 
 //cat implementation
 void catInode(char* path, word blockSize, FILE* ufs, listNode* currentDir);
+
+//ls -l implementation
+void printNodeInfo(inode node, word blockSize);

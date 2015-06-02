@@ -589,3 +589,62 @@ void catInode(char* path, word blockSize, FILE* ufs, listNode* currentDir){
 		list = removeList(list);
 	}
 }
+
+
+void printNodeInfo(inode node, word blockSize){
+	
+	
+	//permissions
+	printf("        ");
+	if (node.metadata.flags&FlagPmRead) {
+		printf("R");
+	}else{
+		printf("-");
+	}
+	if (node.metadata.flags&FlagPmWrite) {
+		printf("W");
+	}else{
+		printf("-");
+	}
+	if (node.metadata.flags&FlagPmExec) {
+		printf("X");
+	}else{
+		printf("-");
+	}
+	
+	
+	printf("\t");
+	//size
+	word i=0;
+	while (node.blocks[i]) {
+		i++;
+	}
+	
+	if (node.metadata.flags&FlagIsDir) {
+		printf("%7d",sizeof(inode));
+	}else{
+		printf("%7d",i*blockSize);
+	}
+	
+	printf("\t");
+	
+	
+	
+	char* timeString = asctime(localtime(&node.metadata.time));
+	
+	word len = strlen(timeString);
+	
+	timeString[19] = 0;
+	
+	printf("%s", timeString);
+	
+	printf("\t");
+	
+	
+	//name
+	
+	printf("%s", node.metadata.name);
+	printf("\n");
+}
+
+
