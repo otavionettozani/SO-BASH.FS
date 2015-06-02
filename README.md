@@ -13,10 +13,6 @@ Existe algum bug ao salvar a timestamp do arquivo, na conversao esta dando uns e
 
 ====== Programas ========
 
-Bash.sh:
-
-
-Comandos -d
 
 
 =====Interno ao -b========

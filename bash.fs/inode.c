@@ -255,11 +255,20 @@ word createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte re
 	//set the name of the inode
 	strcpy(newInode.metadata.name, filename);
 	
-	
+	//setup if is dir or file -- also update superblock
+	superBlock sBlock;
+	fseek(ufs, 0, SEEK_SET);
+	fread(&sBlock, sizeof(superBlock), 1, ufs);
 	if (isDirectory){
 		setBit(&newInode.metadata.flags, FlagIsDir);
+		sBlock.inodesDirectories++;
+	}else{
+		sBlock.inodesFiles++;
 	}
+	fseek(ufs, 0, SEEK_SET);
+	fwrite(&sBlock, sizeof(superBlock), 1, ufs);
 	
+	//setup permissions
 	changeInodePermissions(&newInode, read, write, execute);
 	
 	newInode.metadata.parent = directory->id;
@@ -287,7 +296,16 @@ void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks,
 	
 	word i =0;
 	
+	superBlock sBlock;
+	fseek(ufs, 0, SEEK_SET);
+	fread(&sBlock, sizeof(superBlock), 1, ufs);
+	
 	if(node->metadata.flags & FlagIsDir){
+		
+		sBlock.inodesDirectories--;
+		fseek(ufs, 0, SEEK_SET);
+		fwrite(&sBlock, sizeof(superBlock), 1, ufs);
+		
 		inode child;
 		halfWord childAddr;
 		for(i=0; i<1024;i++){
@@ -297,7 +315,13 @@ void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks,
 				deleteInode(&child, node,blockSize,maxBlocks, ufs);
 			}
 		}
+		
 	}else{
+		
+		sBlock.inodesFiles--;
+		fseek(ufs, 0, SEEK_SET);
+		fwrite(&sBlock, sizeof(superBlock), 1, ufs);
+		
 		//is a file, must remove the blocks it occupies
 		byte* zeros = (byte*) malloc(blockSize*sizeof(byte));
 		word i;
@@ -319,7 +343,6 @@ void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks,
 		}
 		
 		free(zeros);
-		
 	}
 	
 	i=0;
@@ -520,6 +543,17 @@ void setBlockBitmapAsUsed(halfWord block, FILE* ufs){
 	fseek(ufs, addrByte, SEEK_SET);
 	fwrite(&bitmapPosition, sizeof(byte), 1, ufs);
 	
+	
+	//write the data of consumption to superblock
+	
+	superBlock sBlock;
+	
+	fseek(ufs, 0, SEEK_SET);
+	fread(&sBlock, sizeof(superBlock), 1, ufs);
+	sBlock.usedBlocks ++;
+	fseek(ufs, 0, SEEK_SET);
+	fwrite(&sBlock, sizeof(superBlock), 1, ufs);
+	
 	return;
 	
 }
@@ -536,6 +570,19 @@ void setBlockBitmapAsUnused(halfWord block, FILE* ufs){
 	
 	fseek(ufs, addrByte, SEEK_SET);
 	fwrite(&bitmapPosition, sizeof(byte), 1, ufs);
+	
+	
+	//write the data of consumption to superblock
+	
+	superBlock sBlock;
+	
+	fseek(ufs, 0, SEEK_SET);
+	fread(&sBlock, sizeof(superBlock), 1, ufs);
+	sBlock.usedBlocks --;
+	fseek(ufs, 0, SEEK_SET);
+	fwrite(&sBlock, sizeof(superBlock), 1, ufs);
+	
+	
 	
 	return;
 }

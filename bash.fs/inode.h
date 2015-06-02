@@ -29,7 +29,8 @@ typedef struct SuperBlock{
 	word magicNumber;
 	halfWord rootInode;
 	halfWord usedBlocks;
-	halfWord inodesQuantity;
+	halfWord inodesDirectories;
+	halfWord inodesFiles;
 } superBlock;
 
 //---------inode definitions-----------//

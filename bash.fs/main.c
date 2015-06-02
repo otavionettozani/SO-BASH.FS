@@ -229,6 +229,11 @@ int main(int argc, const char * argv[]) {
 	if (mode== modeD){
 		
 		//-------------------------- MODE D ------------------------------------//
+		
+		halfWord usedInodes = sBlock.inodesFiles+sBlock.inodesDirectories;
+		
+		printf("Used Inodes: %i\nUsed Directories: %i\nUsed Data Blocks: %i\n",usedInodes,sBlock.inodesDirectories,sBlock.usedBlocks);
+		
 		fclose(ufs);
 		return 0;
 	}
