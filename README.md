@@ -2,11 +2,14 @@
 
 TODO
 
+
+Testar todo o sistema, observar se algum erro ocorre e tentar debugar, mas parece estar tudo funcionando.
+
+
 ======= Estruturas =======
 
-Mensagem de erro quando tentar criar algo com nome maior do que 255 caracteres
 
-Cascatar o erro de quando não se tem mais blocos livre e quando não se tem mais inodes livres para o modo -b e -i
+
 ====== Programas ========
 
 
