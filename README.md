@@ -7,10 +7,6 @@ TODO
 Mensagem de erro quando tentar criar algo com nome maior do que 255 caracteres
 
 Cascatar o erro de quando não se tem mais blocos livre e quando não se tem mais inodes livres para o modo -b e -i
-
-Existe algum bug ao salvar a timestamp do arquivo, na conversao esta dando uns erros, nao tenho ideia de onde isso acontece
-
-
 ====== Programas ========
 
 

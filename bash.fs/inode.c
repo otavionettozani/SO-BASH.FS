@@ -291,7 +291,7 @@ word createInodeInDirectory(inode* directory, char* filename, FILE* ufs, byte re
 	return convertRelativeAddressToAbsoluteAddress(newInode.id);
 }
 
-void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks, FILE*ufs){
+byte deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks, FILE*ufs){
 	
 	
 	word i =0;
@@ -299,6 +299,11 @@ void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks,
 	superBlock sBlock;
 	fseek(ufs, 0, SEEK_SET);
 	fread(&sBlock, sizeof(superBlock), 1, ufs);
+	
+	if (!((node->metadata.flags&FlagPmWrite)&&(parent->metadata.flags&FlagPmWrite))) {
+		printf("Permission Denied For File '%s' at Directory '%s'\n",node->metadata.name,parent->metadata.name);
+		return 0;
+	}
 	
 	if(node->metadata.flags & FlagIsDir){
 		
@@ -308,12 +313,19 @@ void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks,
 		
 		inode child;
 		halfWord childAddr;
+		byte allChildrenDeleted = 1;
+		
 		for(i=0; i<1024;i++){
 			childAddr = node->blocks[i];
 			if(childAddr){
 				child = getInodeFromRelativeAddress(childAddr, ufs);
-				deleteInode(&child, node,blockSize,maxBlocks, ufs);
+				allChildrenDeleted &= deleteInode(&child, node,blockSize,maxBlocks, ufs);
 			}
+		}
+		
+		if (!allChildrenDeleted) {
+			printf("Directory %s has children without write permission\n",node->metadata.name);
+			return 0;
 		}
 		
 	}else{
@@ -367,7 +379,7 @@ void deleteInode(inode* node, inode* parent, halfWord blockSize, word maxBlocks,
 	saveInode(parent, ufs);
 	saveInode(node, ufs);
 	
-	
+	return 1;
 	
 }
 

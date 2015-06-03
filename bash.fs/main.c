@@ -337,7 +337,7 @@ int main(int argc, const char * argv[]) {
 					children = createListOfChildren(currentDirectory->node, ufs);
 					if(readArguments == 2 && !strcmp(arg1, "-l")){
 						//print with -l flag
-						printf("permissions\t%7s\t%19s\tname\n","size","timestamp");
+						printf("|permissions|\t%7s|\t%19s|\t%10s|\n","size","timestamp", "name");
 						while (children!=NULL) {
 							printNodeInfo(children->node, blockSize);
 							children = removeList(children);

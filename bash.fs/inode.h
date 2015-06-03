@@ -112,8 +112,8 @@ word seekInDirectory(inode directory, char* fileName, FILE* ufs);
 word createInodeInDirectory(inode* directory,char* filename, FILE* ufs, byte read,
 							byte write, byte execute, byte isDirectory);
 
-//delete the selected inode
-void deleteInode(inode* node,inode* parent, halfWord blockSize, word maxBlocks,FILE*ufs);
+//delete the selected inode returns 1 if successfull, 0 if not
+byte deleteInode(inode* node,inode* parent, halfWord blockSize, word maxBlocks,FILE*ufs);
 
 //set the bit relative to the inode as used in the inode bitmap
 void setInodeBitmapAsUsed(inode node, FILE* ufs);

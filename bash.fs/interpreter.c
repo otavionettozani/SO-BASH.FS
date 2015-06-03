@@ -595,7 +595,7 @@ void printNodeInfo(inode node, word blockSize){
 	
 	
 	//permissions
-	printf("        ");
+	printf("|        ");
 	if (node.metadata.flags&FlagPmRead) {
 		printf("R");
 	}else{
@@ -613,7 +613,7 @@ void printNodeInfo(inode node, word blockSize){
 	}
 	
 	
-	printf("\t");
+	printf("|\t");
 	//size
 	word i=0;
 	while (node.blocks[i]) {
@@ -621,29 +621,45 @@ void printNodeInfo(inode node, word blockSize){
 	}
 	
 	if (node.metadata.flags&FlagIsDir) {
-		printf("%7d",sizeof(inode));
+		printf("%7d|",sizeof(inode));
 	}else{
-		printf("%7d",i*blockSize);
+		printf("%7d|",i*blockSize);
 	}
 	
 	printf("\t");
 	
+	time_t time = node.metadata.time;
 	
-	
-	char* timeString = asctime(localtime(&node.metadata.time));
+	char* timeString = asctime(localtime(&time));
 	
 	word len = strlen(timeString);
 	
 	timeString[19] = 0;
 	
-	printf("%s", timeString);
+	printf("%s|", timeString);
 	
 	printf("\t");
 	
 	
 	//name
 	
-	printf("%s", node.metadata.name);
+	halfWord nameLen = strlen(node.metadata.name);
+	byte name[11] = {0};
+	if (nameLen > 10) {
+		byte i = 0;
+		for (;i<7; i++) {
+			name[i] = node.metadata.name[i];
+		}
+		name[7] = '.';
+		name[8] = '.';
+		name[9] = '.';
+		
+		printf("%10s|", name);
+	}else{
+		printf("%10s|", node.metadata.name);
+	}
+	
+	
 	printf("\n");
 }
 
