@@ -275,6 +275,10 @@ void createDirectory(char* path, FILE* ufs, listNode* currentDir){
 		path[0] = 0;
 	}
 	
+	if(strlen(nameCopy)>255){
+		printf("Error: Name is too long!\n");
+		return;
+	}
 	
 	listNode* list = createListFromString(path, currentDir, ufs);
 	
@@ -458,7 +462,7 @@ void changePermissions(char* path, char* permissions, FILE* ufs, listNode* curre
 }
 
 
-void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE* ufs, listNode* currentDir){
+byte echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE* ufs, listNode* currentDir){
 	
 	char* lastBar;
 	char nameCopy[256]={0};
@@ -477,13 +481,17 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 		path[0] = 0;
 	}
 	
+	if(strlen(nameCopy)>255){
+		printf("Error: Name is too long!\n");
+		return 0;
+	}
 	
 	listNode* list = createListFromString(path, currentDir, ufs);
 	
 	listNode* aux = currentDir;
 	
 	if(list == NULL){
-		return;
+		return 0;
 	}
 	
 	//find if the desired path is parent of your directory
@@ -500,7 +508,7 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 	
 	
 	word dataSize = strlen(message);
-	
+	byte writtenData = 0;
 	if(directoryHasChildWithName(aux->node, (byte*)nameCopy, ufs)==1){
 		inode* node;
 		listNode* fileNode = createListFromString(nameCopy, aux, ufs);
@@ -515,7 +523,7 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 			while (fileNode != NULL) {
 				fileNode = removeList(fileNode);
 			}
-			return;
+			return 0;
 		}
 		
 		
@@ -527,10 +535,10 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 			while (fileNode != NULL) {
 				fileNode = removeList(fileNode);
 			}
-			return;
+			return 0;
 		}
 		
-		setDataToInode((byte*)message, dataSize, node, ufs, blockSize, maxBlocks);
+		writtenData = setDataToInode((byte*)message, dataSize, node, ufs, blockSize, maxBlocks);
 		while (fileNode != NULL) {
 			fileNode = removeList(fileNode);
 		}
@@ -542,12 +550,12 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 			while (list != NULL) {
 				list = removeList(list);
 			}
-			return;
+			return 0;
 		}
 		
 		word addr = createInodeInDirectory(&aux->node, nameCopy, ufs, 1, 1, 1, 0);
 		node = getInodeFromAbsoluteAddress(addr, ufs);
-		setDataToInode((byte*)message, dataSize, &node, ufs, blockSize, maxBlocks);
+		writtenData = setDataToInode((byte*)message, dataSize, &node, ufs, blockSize, maxBlocks);
 	}
 	
 	
@@ -555,7 +563,7 @@ void echoToInode(char* path, char* message, word blockSize, word maxBlocks ,FILE
 		list = removeList(list);
 	}
 	
-	
+	return writtenData;
 }
 
 

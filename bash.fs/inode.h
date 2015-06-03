@@ -138,8 +138,8 @@ word getFreeBlock(FILE* ufs , halfWord blockSize, word maxBlocks);
 //copy the given bytes to the block (give the absolute address of the block)
 void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord blockSize ,word maxBlocks);
 
-//set the given data to the given inode
-void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks);
+//set the given data to the given inode. returns 0 if fails 1 otherwise
+byte setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks);
 
 //print all the inode data
 void printInodeData(inode node, halfWord blockSize ,FILE* ufs);

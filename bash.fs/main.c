@@ -152,9 +152,11 @@ int main(int argc, const char * argv[]) {
 			
 			word addr = createInodeInDirectory(&list->node, nameCopy, ufs, 1, 1, 1, 0);
 			inode node = getInodeFromAbsoluteAddress(addr, ufs);
-			setDataToInode((byte*)buffer, size, &node, ufs, blockSize, maxBlocks);
 			
-			printf("Transfer of file was successfull! Copied %d bytes",size);
+			
+			if(setDataToInode((byte*)buffer, size, &node, ufs, blockSize, maxBlocks)){
+				printf("Transfer of file was successfull! Copied %d bytes",size);
+			}
 			
 		}
 		

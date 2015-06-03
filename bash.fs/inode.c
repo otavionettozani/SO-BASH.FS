@@ -448,16 +448,43 @@ void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord
 
 
 
-void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
+byte setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
 	
 	if ((node->metadata.flags & FlagIsDir)) {
-		printf("Error: Can't allocate blocks to directory!");
-		return;
+		printf("Error: Can't allocate blocks to a directory!");
+		return 0;
+	}
+	word i;
+	
+	//number of blocks needed to alloc new data
+	word blocksQuantity = size/blockSize + ((size%blockSize)!=0);
+	
+	//number of blocks that will be freed from this file
+	word freedBlocks = 0;
+	i=0;
+	while (node->blocks[i]) {
+		freedBlocks++;
+		i++;
+	}
+	
+	superBlock sBlock;
+	
+	fseek(ufs, 0, SEEK_SET);
+	fread(&sBlock, sizeof(superBlock), 1, ufs);
+	
+	if(blocksQuantity > maxBlocks+freedBlocks - sBlock.usedBlocks){
+		printf("Error: Not enought blocks on system!\n");
+		return 0;
+	}
+	
+	if (blocksQuantity > 1024) {
+		printf("Error: Data size is not supported by one inode");
+		return 0;
 	}
 	
 	//clear old data
 	byte* zeros = (byte*) malloc(blockSize*sizeof(byte));
-	word i;
+	
 	for (i=0;i<blockSize;i++) {
 		zeros[i] = 0;
 	}
@@ -479,7 +506,7 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 	
 	
 	//get free blocks
-	word blocksQuantity = size/blockSize + ((size%blockSize)!=0);
+	
 	word newBlockAddr;
 	
 	i=0;
@@ -487,7 +514,14 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 		newBlockAddr = getFreeBlock(ufs, blockSize, maxBlocks);
 		if (!newBlockAddr) {
 			printf("Error: No free blocks to save the requested data\n");
-			return;
+			word j=0;
+			while (node->blocks[j]) {
+				setBlockBitmapAsUnused(node->blocks[j], ufs);
+				node->blocks[j] = 0;
+				j++;
+			}
+			
+			return 0;
 		}
 		node->blocks[i] = convertBlockAbsoluteAddressToRelativeAddress(newBlockAddr, blockSize, ufs);
 		setBlockBitmapAsUsed(node->blocks[i], ufs);
@@ -509,6 +543,7 @@ void setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 	//save inode
 	saveInode(node, ufs);
 	
+	return 1;
 }
 
 
