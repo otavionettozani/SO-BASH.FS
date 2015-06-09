@@ -1,10 +1,8 @@
 //
 //  main.c
 //  bash.fs
-//
-//  Created by Otávio Netto Zani on 26/05/15.
-//  Copyright (c) 2015 Otávio Netto Zani. All rights reserved.
-//
+//  Otavio Netto Zani - RA:103697
+//  Flavio Matheus Muniz Ribeiro da Silva - RA:146098
 
 #include <stdio.h>
 #include "interpreter.h"
@@ -153,9 +151,8 @@ int main(int argc, const char * argv[]) {
 			word addr = createInodeInDirectory(&list->node, nameCopy, ufs, 1, 1, 1, 0);
 			inode node = getInodeFromAbsoluteAddress(addr, ufs);
 			
-			
 			if(setDataToInode((byte*)buffer, size, &node, ufs, blockSize, maxBlocks)){
-				printf("Transfer of file was successfull! Copied %d bytes",size);
+				printf("Transfer of file was successfull! Copied %d bytes\n",size);
 			}
 			
 		}

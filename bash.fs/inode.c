@@ -1,10 +1,8 @@
 //
 //  inode.c
 //  bash.fs
-//
-//  Created by Otávio Netto Zani on 25/05/15.
-//  Copyright (c) 2015 Otávio Netto Zani. All rights reserved.
-//
+//  Otavio Netto Zani - RA:103697
+//  Flavio Matheus Muniz Ribeiro da Silva - RA:146098
 
 #include "inode.h"
 #include <stdlib.h>
@@ -448,10 +446,10 @@ void copyBytesToBlock(byte* bytes, halfWord size, word block,FILE* ufs, halfWord
 
 
 
-byte setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
+byte setDataToInode(byte* bytes, word size, inode* node, FILE* ufs, halfWord blockSize ,word maxBlocks){
 	
 	if ((node->metadata.flags & FlagIsDir)) {
-		printf("Error: Can't allocate blocks to a directory!");
+		printf("Error: Can't allocate blocks to a directory!\n");
 		return 0;
 	}
 	word i;
@@ -478,7 +476,7 @@ byte setDataToInode(byte* bytes, halfWord size, inode* node, FILE* ufs, halfWord
 	}
 	
 	if (blocksQuantity > 1024) {
-		printf("Error: Data size is not supported by one inode");
+		printf("Error: Data size is not supported by one inode\n");
 		return 0;
 	}
 	

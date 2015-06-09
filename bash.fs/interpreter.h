@@ -2,9 +2,8 @@
 //  interpreter.h
 //  bash.fs
 //
-//  Created by Otávio Netto Zani on 27/05/15.
-//  Copyright (c) 2015 Otávio Netto Zani. All rights reserved.
-//
+//  Otavio Netto Zani - RA:103697
+//  Flavio Matheus Muniz Ribeiro da Silva - RA:146098
 
 #ifndef __bash_fs__interpreter__
 #define __bash_fs__interpreter__
